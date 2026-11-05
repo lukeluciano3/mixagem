@@ -1,13 +1,17 @@
-// Versão do Cache (Incremente sempre para forçar limpeza)
-const CACHE_NAME = 'soundcraft-rta-v2';
+// Versão do Cache
+const CACHE_NAME = 'soundcraft-rta-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-192.png',
+  './icon-maskable-512.png',
+  './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
-  // Força ativação imediata sem esperar fechar as abas antigas
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -17,7 +21,6 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  // Apaga imediatamente qualquer cache antigo (ex: soundcraft-rta-v1)
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
@@ -30,33 +33,46 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// ESTRATÉGIA NETWORK-FIRST:
-// 1. Quando há internet: Busca a versão mais nova do GitHub e atualiza o cache silenciosamente.
-// 2. Quando estiver offline (ou no Wi-Fi da mesa Soundcraft): Usa instantaneamente o cache local.
+// ESTRATÉGIA NETWORK-FIRST COM FALLBACK PARA CACHE OFFLINE
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
+  const request = event.request;
+
+  if (request.method !== 'GET' || !request.url.startsWith('http')) {
+    return;
+  }
+
+  // Não interfere em requisições de outros domínios (ex.: APIs externas)
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) {
     return;
   }
 
   event.respondWith(
-    fetch(event.request)
+    fetch(request)
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
+            cache.put(request, responseToCache);
           });
         }
         return networkResponse;
       })
-      .catch(() => {
-        // Sem internet ou conectado no Wi-Fi da mesa -> Fallback para o cache!
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
+      .catch(async () => {
+        const cachedResponse = await caches.match(request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        // Navegações offline caem sempre na página principal do app
+        if (request.mode === 'navigate') {
+          const appShell = await caches.match('./index.html');
+          if (appShell) {
+            return appShell;
           }
-          return caches.match('./index.html');
-        });
+        }
+
+        return Response.error();
       })
   );
 });

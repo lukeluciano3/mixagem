@@ -2,13 +2,23 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#121316">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#17191e">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Ui-RTA">
+  <meta name="application-name" content="Ui-RTA">
+  <meta name="format-detection" content="telephone=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Soundcraft Ui — Auto-RTA & Master EQ</title>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
   <style>
     :root {
       --bg-dark: #0f1013;
@@ -42,7 +52,7 @@
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
-      padding-bottom: 30px;
+      padding-bottom: calc(30px + env(safe-area-inset-bottom));
     }
 
     /* HEADER & STATUS BAR */
@@ -567,6 +577,9 @@
       </div>
       <input type="text" id="mixerIp" class="ip-input" value="10.10.1.1" placeholder="IP da Mesa">
       <button id="btnConnect" class="btn btn-primary">Conectar</button>
+      <button id="btnInstall" class="btn btn-primary" title="Instalar aplicativo no celular" style="display: none; padding: 7px 10px; font-size: 11px;">
+        📲 Instalar
+      </button>
       <button onclick="forceAppUpdate()" class="btn" title="Limpar cache e carregar versão mais recente do GitHub" style="padding: 7px 10px; font-size: 11px;">
         🔄 Atualizar
       </button>
@@ -1483,6 +1496,59 @@
     }
 
     /* ==========================================================================
+       5.1. PWA: INSTALAÇÃO NO ANDROID E IOS
+       ========================================================================== */
+    let deferredInstallPrompt = null;
+    const btnInstall = document.getElementById('btnInstall');
+    const isStandaloneMode =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+    const isIOSDevice =
+      /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    function showInstallButton() {
+      if (btnInstall && !isStandaloneMode) {
+        btnInstall.style.display = 'inline-flex';
+      }
+    }
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      showInstallButton();
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      if (btnInstall) btnInstall.style.display = 'none';
+      log('[PWA] Aplicativo instalado com sucesso!', 'success');
+    });
+
+    if (isIOSDevice && !isStandaloneMode) {
+      showInstallButton();
+    }
+
+    if (btnInstall) {
+      btnInstall.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const choice = await deferredInstallPrompt.userChoice;
+          log(`[PWA] Instalação ${choice.outcome === 'accepted' ? 'aceita' : 'cancelada'} pelo usuário.`, 'info');
+          deferredInstallPrompt = null;
+          btnInstall.style.display = 'none';
+          return;
+        }
+
+        if (isIOSDevice) {
+          alert('Para instalar no iPhone/iPad:\n\n1. Toque em Compartilhar (ícone de quadrado com seta).\n2. Escolha "Adicionar à Tela de Início".\n3. Confirme em "Adicionar".');
+        } else {
+          alert('Para instalar no Android:\n\n1. Abra o menu do Chrome (três pontos).\n2. Toque em "Instalar aplicativo" ou "Adicionar à tela inicial".\n3. Confirme em "Instalar".');
+        }
+      });
+    }
+
+    /* ==========================================================================
        6. EVENT LISTENERS & FLUXO DE EXECUÇÃO
        ========================================================================== */
     // Botão Conectar Mesa
@@ -1622,7 +1688,7 @@
 
       // Registro do Service Worker com detecção automática de nova versão
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then((reg) => {
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
           // Força checagem de nova versão sempre que abrir
           reg.update();
 

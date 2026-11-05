@@ -34,8 +34,22 @@ Para liberar no **Google Chrome**:
 
 ---
 
+## 📲 Instalar no Celular (Android e iOS)
+
+O app pode ser instalado como um aplicativo nativo, sem loja de aplicativos:
+
+- **Android (Chrome):** toque no botão **📲 Instalar** no topo da página ou abra o menu **⋮ → Instalar aplicativo**. O app aparecerá na gaveta de aplicativos.
+- **iPhone/iPad (Safari):** toque em **Compartilhar** (ícone de quadrado com seta) → **Adicionar à Tela de Início** → **Adicionar**. O botão **📲 Instalar** também mostra essas instruções.
+
+Depois de instalado, o app abre em tela cheia (standalone) e continua funcionando offline.
+
+---
+
 ## 🛠️ Arquivos do Projeto
 
 - `index.html`: A aplicação completa (UI, RTA, Canvas, 31 faders e WebSocket).
 - `sw.js`: Service Worker para funcionamento offline.
-- `manifest.json`: Manifesto PWA para adicionar à tela inicial do celular.
+- `manifest.json`: Manifesto PWA com nome, cores, ícones e modo standalone.
+- `icon-192.png` / `icon-512.png`: Ícones do app (Android/desktop).
+- `icon-maskable-192.png` / `icon-maskable-512.png`: Ícones adaptáveis ao tema do Android.
+- `apple-touch-icon.png`: Ícone usado ao adicionar à Tela de Início no iOS.
