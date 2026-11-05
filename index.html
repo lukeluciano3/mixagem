@@ -1350,6 +1350,18 @@
 
     const rta = new RTAEngine();
 
+    async function refreshInputs() {
+      const sel = document.getElementById('audioInput');
+      if (!sel || !navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+      try {
+        const prev = sel.value;
+        const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput');
+        sel.innerHTML = '<option value="">Entrada padrão do aparelho</option>' +
+          devs.map((d, i) => `<option value="${d.deviceId}">${d.label || 'Microfone ' + (i + 1)}</option>`).join('');
+        sel.value = prev;
+      } catch (e) { /* sem permissão ainda */ }
+    }
+
     /* ==========================================================================
        4. ALGORITMO CONSERVADOR DE MEDIÇÃO E SUGESTÃO DE EQ
        ========================================================================== */
