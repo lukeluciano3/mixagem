@@ -1,0 +1,15 @@
+# Ignorar a pasta com o repositório original do soundcraft-ui
+soundcraft-ui/
+soundcraft-ui/**
+
+# Ignorar certificados locais e scripts de servidor de desenvolvimento
+cert.pfx
+*.pfx
+*.key
+*.cert
+server.js
+
+# Sistema / Node
+node_modules/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#121316">
+  <title>Soundcraft Ui — Auto-RTA & Master EQ</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg-dark: #0f1013;
+      --bg-panel: #17191e;
+      --bg-card: #20232b;
+      --bg-card-hover: #272a34;
+      --border-color: #2e3340;
+      --primary: #00d2ff;
+      --primary-glow: rgba(0, 210, 255, 0.25);
+      --accent: #ff9900;
+      --success: #00e676;
+      --danger: #ff5252;
+      --text-main: #f0f2f5;
+      --text-muted: #8e95a5;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding-bottom: 30px;
+    }
+
+    /* HEADER & STATUS BAR */
+    header {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #00d2ff, #0055ff);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .brand h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .brand span {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .connection-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ip-input {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      width: 125px;
+      font-family: monospace;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .ip-input:focus {
+      border-color: var(--primary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 82, 82, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+
+    .status-badge.connected {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--success);
+      border-color: rgba(0, 230, 118, 0.3);
+    }
+
+    .status-badge.connecting {
+      background: rgba(255, 153, 0, 0.15);
+      color: var(--accent);
+      border-color: rgba(255, 153, 0, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* BUTTONS */
+    .btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--text-muted);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00b4db, #0083b0);
+      border: none;
+      color: #fff;
+      box-shadow: 0 2px 10px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #00c6ee, #0099cc);
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #00e676, #00a854);
+      border: none;
+      color: #121316;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 14px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+    }
+
+    .btn-action:hover {
+      background: linear-gradient(135deg, #1aff8c, #00c261);
+    }
+
+    .btn-apply {
+      background: linear-gradient(135deg, #ff9900, #e67300);
+      border: none;
+      color: #fff;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 14px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+    }
+
+    .btn-apply:hover {
+      background: linear-gradient(135deg, #ffa826, #f27c00);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* MAIN CONTAINER */
+    main {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title span.step-number {
+      background: var(--primary);
+      color: #0f1013;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      margin-right: 8px;
+    }
+
+    /* CONFIG ROW */
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-select {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .form-select:focus {
+      border-color: var(--primary);
+    }
+
+    /* ACTION BAR */
+    .action-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: var(--bg-card);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .action-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .action-info strong {
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .action-info span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* COUNTDOWN & PROGRESS BAR */
+    .progress-box {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00d2ff, #00e676);
+      transition: width 0.1s linear;
+    }
+
+    /* VISUALIZER CANVAS */
+    .visualizer-wrapper {
+      position: relative;
+      background: #0a0b0e;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    canvas#rtaCanvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    /* 31 FADERS RACK */
+    .faders-container {
+      display: grid;
+      grid-template-columns: repeat(31, 1fr);
+      gap: 3px;
+      background: #0a0b0e;
+      padding: 14px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+      min-width: 0;
+    }
+
+    .fader-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 26px;
+    }
+
+    .fader-db {
+      font-size: 9px;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--text-muted);
+      height: 14px;
+      text-align: center;
+    }
+
+    .fader-db.boost {
+      color: var(--primary);
+    }
+
+    .fader-db.cut {
+      color: var(--accent);
+    }
+
+    .fader-track {
+      position: relative;
+      width: 16px;
+      height: 160px;
+      background: #14171d;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: ns-resize;
+    }
+
+    .fader-center-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .fader-bar {
+      position: absolute;
+      width: 8px;
+      border-radius: 2px;
+      left: 4px;
+    }
+
+    .fader-bar.boost {
+      background: linear-gradient(to top, #00b4db, #00e676);
+      bottom: 50%;
+    }
+
+    .fader-bar.cut {
+      background: linear-gradient(to bottom, #ff9900, #ff5252);
+      top: 50%;
+    }
+
+    .fader-thumb {
+      position: absolute;
+      left: 1px;
+      right: 1px;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .fader-freq {
+      font-size: 8.5px;
+      font-family: monospace;
+      color: var(--text-muted);
+      text-align: center;
+      white-space: nowrap;
+      margin-top: 4px;
+    }
+
+    /* FOOTER CONTROLS & LOG */
+    .controls-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .log-box {
+      background: #08090b;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #94a3b8;
+      max-height: 80px;
+      overflow-y: auto;
+      width: 100%;
+    }
+
+    .log-box p {
+      margin-bottom: 3px;
+    }
+
+    .log-box p.success {
+      color: var(--success);
+    }
+
+    .log-box p.error {
+      color: var(--danger);
+    }
+
+    .log-box p.info {
+      color: var(--primary);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      header {
+        padding: 10px 14px;
+      }
+      .brand h1 {
+        font-size: 15px;
+      }
+      .btn-action, .btn-apply {
+        width: 100%;
+        padding: 14px;
+      }
+      .faders-container {
+        padding: 10px 4px;
+      }
+      .fader-col {
+        min-width: 24px;
+      }
+      .fader-track {
+        height: 130px;
+        width: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">Ui</div>
+      <div>
+        <h1>Soundcraft Ui — Auto RTA</h1>
+        <span>Master 31-Band GEQ Calibration</span>
+      </div>
+    </div>
+
+    <div class="connection-bar">
+      <div id="statusBadge" class="status-badge">
+        <span class="status-dot"></span>
+        <span id="statusText">Desconectado</span>
+      </div>
+      <input type="text" id="mixerIp" class="ip-input" value="10.10.1.1" placeholder="IP da Mesa">
+      <button id="btnConnect" class="btn btn-primary">Conectar</button>
+    </div>
+  </header>
+
+  <!-- AVISO DE CONTEXTO SEGURO / HTTPS -->
+  <div id="securityWarning" style="display: none; background: #3b2204; border-bottom: 1px solid #ff9900; padding: 12px 18px; color: #ffcc66; font-size: 13px;">
+    <strong>⚠️ ATENÇÃO: Microfone bloqueado pelo navegador por falta de HTTPS!</strong>
+    <p style="margin-top: 4px; color: #ffdf99;">
+      Navegadores de celular só liberam o microfone em conexões <strong>HTTPS</strong>.
+    </p>
+    <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px;">
+      <a id="btnSwitchHttps" href="#" class="btn" style="background: #ff9900; color: #000; font-weight: bold; text-decoration: none;">
+        👉 Abrir em HTTPS (Porta 8443)
+      </a>
+    </div>
+  </div>
+
+  <!-- AVISO DE CONTEÚDO MISTO PARA GITHUB PAGES -->
+  <div id="mixedContentTip" style="display: none; background: #152233; border-bottom: 1px solid #00d2ff; padding: 12px 18px; color: #bdeaff; font-size: 13px;">
+    <strong>ℹ️ Conectando à Mesa pelo GitHub Pages (HTTPS):</strong>
+    <p style="margin-top: 4px; color: #e2f4ff; line-height: 1.4;">
+      Para o navegador liberar a conexão WebSocket local com a Soundcraft (<code>ws://10.10.1.1</code>):<br>
+      1. Toque no ícone ao lado do endereço do site (ícone de configurações ao lado do cadeado).<br>
+      2. Abra <strong>"Configurações do site"</strong>.<br>
+      3. Na opção <strong>"Conteúdo não seguro"</strong>, mude para <strong>"Permitir"</strong>.
+    </p>
+    <button onclick="document.getElementById('mixedContentTip').style.display='none'" class="btn" style="margin-top: 8px; font-size: 11px; padding: 5px 12px; background: rgba(0,210,255,0.2); border-color: #00d2ff; color: #fff;">
+      Entendi, fechar aviso
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- ETAPA 1: CONFIGURAÇÃO DA MIXAGEM -->
+    <div class="card">
+      <div class="card-title">
+        <div><span class="step-number">1</span>Curva Alvo de Referência Acústica</div>
+      </div>
+      <div class="config-grid">
+        <div class="form-group">
+          <label for="targetCurve">Estilo / Padrão Musical</label>
+          <select id="targetCurve" class="form-select">
+            <option value="house" selected>🎶 Música ao Vivo / House Curve (Harman - Equilíbrio Perfeito)</option>
+            <option value="flat">📏 Resposta Linear Flat (Referência Neutra)</option>
+            <option value="vocal">🎤 Voz & Palavra (Corte de subgraves e clareza vocal)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sampleDuration">Tempo de Escuta do Ruído Rosa</label>
+          <select id="sampleDuration" class="form-select">
+            <option value="4">4 Segundos (Rápido)</option>
+            <option value="6" selected>6 Segundos (Recomendado - Boa Integração)</option>
+            <option value="8">8 Segundos (Ambientes Grandes / Reverberantes)</option>
+            <option value="10">10 Segundos (Máxima Precisão Acústica)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="maxBoost">Proteção Máxima de Ganho (Boost Limit)</label>
+          <select id="maxBoost" class="form-select">
+            <option value="2">+2.0 dB (Conservador / Alta Potência)</option>
+            <option value="3" selected>+3.0 dB (Padrão de Segurança Profissional)</option>
+            <option value="4">+4.0 dB (Moderado)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="maxCut">Profundidade Máxima de Corte (Cut Limit)</label>
+          <select id="maxCut" class="form-select">
+            <option value="-6">-6.0 dB (Suave)</option>
+            <option value="-9" selected>-9.0 dB (Padrão - Elimina Ressonâncias)</option>
+            <option value="-12">-12.0 dB (Agressivo / Salas Problemáticas)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 2: CAPTURA E ANÁLISE DO RUÍDO ROSA -->
+    <div class="card">
+      <div class="card-title">
+        <div><span class="step-number">2</span>Captura RTA em Tempo Real (Microfone)</div>
+        <div id="countdownTimer" style="font-family: monospace; color: var(--primary); font-weight: bold;"></div>
+      </div>
+
+      <div class="action-container">
+        <div class="action-info">
+          <strong>Ruído Rosa Ativo na Mesa</strong>
+          <span>Toque o ruído rosa no som (ex: via cabo P2), posicione o celular no ponto de escuta e inicie.</span>
+        </div>
+        <button id="btnStartRta" class="btn btn-action">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+          INICIAR ANÁLISE RTA
+        </button>
+      </div>
+
+      <div id="progressBox" class="progress-box">
+        <div id="progressBar" class="progress-bar-fill"></div>
+      </div>
+
+      <div class="visualizer-wrapper" style="margin-top: 14px;">
+        <canvas id="rtaCanvas"></canvas>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #00d2ff;"></div>
+          <span>Espectro Medido (Ambiente RTA)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ffcc00; border-top: 1px dashed #ffcc00;"></div>
+          <span>Curva Alvo Desejada (Target House Curve)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #00e676;"></div>
+          <span>Correção de Ganho (+ Boost)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ff5252;"></div>
+          <span>Correção de Ganho (- Corte de Ressonância)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 3: EQUALIZADOR GRÁFICO DE 31 BANDAS DO MASTER -->
+    <div class="card">
+      <div class="card-title">
+        <div><span class="step-number">3</span>Equalizador Gráfico Master (31 Bandas)</div>
+        <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Valores calculados em dB (Arraste para ajuste manual se desejar)</span>
+      </div>
+
+      <div id="fadersRack" class="faders-container">
+        <!-- 31 Faders serão gerados dinamicamente via JS -->
+      </div>
+
+      <div class="controls-footer">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btnResetFlat" class="btn">
+            🔄 Zerar Faders (0 dB Flat)
+          </button>
+          <button id="btnToggleBypass" class="btn">
+            Bypass EQ: <strong id="bypassState" style="color: var(--success); margin-left: 4px;">LIGADO</strong>
+          </button>
+        </div>
+
+        <button id="btnApplyMixer" class="btn btn-apply" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          APLICAR NO MASTER DA SOUNDCRAFT
+        </button>
+      </div>
+    </div>
+
+    <!-- PAINEL DE LOGS -->
+    <div class="card">
+      <div class="card-title">Status e Log de Transmissão WebSocket</div>
+      <div id="logBox" class="log-box">
+        <p class="info">[Sistema] Aplicativo pronto. Pode funcionar offline.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* ==========================================================================
+       1. CONSTANTES E CONFIGURAÇÕES DE ÁUDIO (31 BANDAS ISO)
+       ========================================================================== */
+    const ISO_FREQUENCIES = [
+      20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160,
+      200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
+      2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000
+    ];
+
+    // Formatação amigável das frequências
+    function formatFreq(hz) {
+      if (hz >= 1000) {
+        return (hz / 1000) + 'k';
+      }
+      return hz.toString();
+    }
+
+    // Curvas Alvo (dB relativo padrão em engenharia de som)
+    const TARGET_CURVES = {
+      // House Curve (Harman PA Curve): graves corpulentos, médios claros e agudos suaves
+      house: [
+        1.5, 2.0, 2.5, 3.0, 3.0, 2.5, 2.0, 1.0, 0.5, 0.0,
+        -0.5, -0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, -0.5, -1.0, -1.5, -2.0, -3.0, -4.5, -6.0, -8.0
+      ],
+      // Linear Flat
+      flat: new Array(31).fill(0),
+      // Vocal / Fala (corte de estrondo grave e ênfase na presença de 1.5k a 3.5k)
+      vocal: [
+        -12, -10, -8, -6, -3, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0.5, 1.0, 1.5, 1.5, 1.5, 1.5,
+        1.0, 0.5, 0, 0, 0, -1.0, -2.0, -3.5, -5.0, -7.0, -9.0
+      ]
+    };
+
+    // Estado Atual do App
+    const state = {
+      gainsDB: new Array(31).fill(0), // Faders de -15dB a +15dB (0 = flat)
+      measuredRTA: new Array(31).fill(-60), // Nível medido em dB
+      isAnalyzing: false,
+      isBypassed: false
+    };
+
+    /* ==========================================================================
+       2. PROTOCOLO SOUNDCRAFT UI (EXTRAÍDO E NATIVO WEBSOCKET)
+       ========================================================================== */
+    class SoundcraftMixer {
+      constructor() {
+        this.ws = null;
+        this.ip = '10.10.1.1';
+        this.isConnected = false;
+        this.aliveTimer = null;
+      }
+
+      connect(ip) {
+        this.ip = ip || this.ip;
+        this.disconnect();
+
+        log(`[Mixer] Conectando a ws://${this.ip}...`, 'info');
+        updateStatus('connecting', 'Conectando...');
+
+        try {
+          this.ws = new WebSocket(`ws://${this.ip}`);
+        } catch (e) {
+          log(`[Mixer] Erro ao criar WebSocket: ${e.message}`, 'error');
+          updateStatus('disconnected', 'Desconectado');
+          return;
+        }
+
+        this.ws.onopen = () => {
+          this.isConnected = true;
+          log(`[Mixer] Conectado com sucesso na mesa (${this.ip})!`, 'success');
+          updateStatus('connected', 'Conectado');
+
+          // Keepalive ALIVE a cada 1000ms (exigido pelo protocolo Soundcraft Ui)
+          this.aliveTimer = setInterval(() => {
+            if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+              this.ws.send('3:::ALIVE');
+            }
+          }, 1000);
+
+          // Habilita o botão de aplicar
+          document.getElementById('btnApplyMixer').disabled = false;
+        };
+
+        this.ws.onmessage = (event) => {
+          const raw = event.data;
+          // Resposta padrão do Soundcraft começa com "3:::"
+          if (raw.startsWith('3:::')) {
+            const body = raw.slice(4);
+            const lines = body.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('SETD^m.eq.bypass^')) {
+                const val = Number(line.split('^')[2]);
+                state.isBypassed = val === 1;
+                updateBypassUi();
+              }
+            }
+          }
+        };
+
+        this.ws.onerror = (err) => {
+          log(`[Mixer] Falha de comunicação no IP ${this.ip}.`, 'error');
+          if (window.location.protocol === 'https:') {
+            log(`[Atenção Mixed Content] Em HTTPS (GitHub Pages), o navegador pode bloquear WebSocket local (ws://).`, 'error');
+            log(`👉 No Chrome: toque nas configurações do site ao lado do endereço -> "Conteúdo não seguro" -> "Permitir".`, 'info');
+            const tip = document.getElementById('mixedContentTip');
+            if (tip) tip.style.display = 'block';
+          }
+        };
+
+        this.ws.onclose = () => {
+          this.isConnected = false;
+          clearInterval(this.aliveTimer);
+          log(`[Mixer] Conexão encerrada.`, 'info');
+          updateStatus('disconnected', 'Desconectado');
+          document.getElementById('btnApplyMixer').disabled = true;
+        };
+      }
+
+      disconnect() {
+        if (this.aliveTimer) clearInterval(this.aliveTimer);
+        if (this.ws) {
+          this.ws.close();
+          this.ws = null;
+        }
+        this.isConnected = false;
+        updateStatus('disconnected', 'Desconectado');
+        document.getElementById('btnApplyMixer').disabled = true;
+      }
+
+      // Envia comando SETD bruto formatado com prefixo 3:::
+      sendSetd(path, value) {
+        if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+          log(`[Mixer] Erro: mesa não conectada ao tentar enviar ${path}.`, 'error');
+          return;
+        }
+        this.ws.send(`3:::SETD^${path}^${value}`);
+      }
+
+      // Converte dB (-15 a +15) para valor linear Soundcraft (0.0 a 1.0, 0.5 = 0dB)
+      dbToFader(gainDB) {
+        // Range da Soundcraft GEQ: -15 dB (0.0) a +15 dB (1.0)
+        const clamped = Math.max(-15, Math.min(15, gainDB));
+        const val = 0.5 + (clamped / 30);
+        return Math.round(val * 10000) / 10000;
+      }
+
+      // Aplica as 31 bandas nos canais Master L e Master R
+      applyMasterGEQ(gainsArray) {
+        if (!this.isConnected) {
+          alert('Por favor, conecte à mesa primeiro antes de aplicar!');
+          return;
+        }
+
+        log(`[Mixer] Enviando 31 bandas de GEQ para o Master...`, 'info');
+
+        // Garante que o EQ do Master está ativo e vinculado em estéreo
+        this.sendSetd('m.eq.linked', 1);
+        this.sendSetd('m.eq.bypass', 0);
+        state.isBypassed = false;
+        updateBypassUi();
+
+        // Envia as 31 bandas para L e R
+        for (let i = 0; i < 31; i++) {
+          const val = this.dbToFader(gainsArray[i]);
+          this.sendSetd(`m.eq.peak.l.${i}`, val);
+          this.sendSetd(`m.eq.peak.r.${i}`, val);
+        }
+
+        log(`[Mixer] Equalização Master aplicada com sucesso na Soundcraft!`, 'success');
+      }
+
+      // Zera o EQ do Master para 0 dB flat
+      resetFlat() {
+        const flatArray = new Array(31).fill(0);
+        this.applyMasterGEQ(flatArray);
+      }
+
+      // Alterna Bypass do EQ
+      toggleBypass() {
+        const nextBypass = state.isBypassed ? 0 : 1;
+        this.sendSetd('m.eq.bypass', nextBypass);
+        state.isBypassed = nextBypass === 1;
+        updateBypassUi();
+        log(`[Mixer] Master EQ Bypass: ${state.isBypassed ? 'DESLIGADO' : 'LIGADO'}`, 'info');
+      }
+    }
+
+    const mixer = new SoundcraftMixer();
+
+    /* ==========================================================================
+       3. MOTOR DE ÁUDIO RTA (WEB AUDIO API)
+       ========================================================================== */
+    class RTAEngine {
+      constructor() {
+        this.audioCtx = null;
+        this.analyser = null;
+        this.micStream = null;
+        this.fftSize = 8192;
+        this.buffer = null;
+        this.bandBins = [];
+      }
+
+      async init() {
+        if (!this.audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          this.audioCtx = new AudioContextClass();
+        }
+
+        if (this.audioCtx.state === 'suspended') {
+          await this.audioCtx.resume();
+        }
+
+        if (!this.micStream) {
+          const constraints = {
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false
+            }
+          };
+
+          let getMedia = null;
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            getMedia = () => navigator.mediaDevices.getUserMedia(constraints);
+          } else {
+            const legacyGetMedia = navigator.getUserMedia ||
+                                   navigator.webkitGetUserMedia ||
+                                   navigator.mozGetUserMedia ||
+                                   navigator.msGetUserMedia;
+            if (legacyGetMedia) {
+              getMedia = () => new Promise((res, rej) => legacyGetMedia.call(navigator, constraints, res, rej));
+            }
+          }
+
+          if (!getMedia) {
+            const httpsUrl = `https://${window.location.hostname}:8443`;
+            throw new Error(
+              `O navegador exige HTTPS para liberar o microfone.\n\n` +
+              `Por favor, acesse pelo endereço seguro:\n` +
+              `👉 ${httpsUrl}\n\n` +
+              `(Se o navegador avisar "Conexão não é particular", toque em "Avançado" -> "Ir para... não seguro")`
+            );
+          }
+
+          // Captura com todos os filtros automáticos do celular DESATIVADOS
+          this.micStream = await getMedia();
+
+          const source = this.audioCtx.createMediaStreamSource(this.micStream);
+          this.analyser = this.audioCtx.createAnalyser();
+          this.analyser.fftSize = this.fftSize;
+          this.analyser.smoothingTimeConstant = 0.5;
+          source.connect(this.analyser);
+
+          this.buffer = new Float32Array(this.analyser.frequencyBinCount);
+          this.calcBandBins();
+        }
+      }
+
+      // Pré-calcula os limites de bins FFT para cada uma das 31 bandas de 1/3 oitava
+      calcBandBins() {
+        const sampleRate = this.audioCtx.sampleRate;
+        const binWidth = sampleRate / this.fftSize;
+        this.bandBins = [];
+
+        for (let i = 0; i < 31; i++) {
+          const fc = ISO_FREQUENCIES[i];
+          // Limites inferior e superior de 1/3 de oitava (f * 2^(±1/6))
+          const fLow = fc * 0.8908987;
+          const fHigh = fc * 1.122462;
+
+          let binStart = Math.max(1, Math.floor(fLow / binWidth));
+          let binEnd = Math.min(this.buffer.length - 1, Math.ceil(fHigh / binWidth));
+          if (binStart > binEnd) binEnd = binStart;
+
+          this.bandBins.push({ binStart, binEnd });
+        }
+      }
+
+      // Lê a energia instantânea em dB para cada uma das 31 bandas
+      getInstantBands() {
+        this.analyser.getFloatFrequencyData(this.buffer);
+        const bands = new Float32Array(31);
+
+        for (let i = 0; i < 31; i++) {
+          const { binStart, binEnd } = this.bandBins[i];
+          let sumPower = 0;
+          let count = 0;
+
+          for (let b = binStart; b <= binEnd; b++) {
+            const dbVal = this.buffer[b];
+            if (isFinite(dbVal)) {
+              sumPower += Math.pow(10, dbVal / 10);
+              count++;
+            }
+          }
+
+          if (count > 0 && sumPower > 0) {
+            bands[i] = 10 * Math.log10(sumPower / count);
+          } else {
+            bands[i] = -100;
+          }
+        }
+        return bands;
+      }
+
+      // Grava e tira a média espacial durante os segundos determinados
+      async startCapture(durationSeconds, onProgress) {
+        await this.init();
+
+        const samples = [];
+        const intervalMs = 50; // ~20 frames por segundo
+        const totalFrames = Math.round((durationSeconds * 1000) / intervalMs);
+        let frameCount = 0;
+
+        return new Promise((resolve) => {
+          const timer = setInterval(() => {
+            const instant = this.getInstantBands();
+            samples.push(instant);
+            frameCount++;
+
+            // Atualiza visualização em tempo real
+            state.measuredRTA = instant;
+            renderVisualizer();
+
+            const progress = (frameCount / totalFrames);
+            const remaining = Math.max(0, durationSeconds - (frameCount * (intervalMs / 1000))).toFixed(1);
+            if (onProgress) onProgress(progress, remaining);
+
+            if (frameCount >= totalFrames) {
+              clearInterval(timer);
+
+              // Calcula média energética em cada banda
+              const averaged = new Float32Array(31);
+              for (let b = 0; b < 31; b++) {
+                let sumPower = 0;
+                for (let s = 0; s < samples.length; s++) {
+                  sumPower += Math.pow(10, samples[s][b] / 10);
+                }
+                averaged[b] = 10 * Math.log10(sumPower / samples.length);
+              }
+
+              resolve(averaged);
+            }
+          }, intervalMs);
+        });
+      }
+    }
+
+    const rta = new RTAEngine();
+
+    /* ==========================================================================
+       4. ALGORITMO DE MIXAGEM / EQUALIZAÇÃO (AUDIO ENGINEERING BEST PRACTICES)
+       ========================================================================== */
+    function calculateAutoEQ(measuredBands) {
+      const curveType = document.getElementById('targetCurve').value;
+      const targetCurve = TARGET_CURVES[curveType] || TARGET_CURVES.house;
+
+      const maxBoost = parseFloat(document.getElementById('maxBoost').value);
+      const maxCut = parseFloat(document.getElementById('maxCut').value);
+
+      // Referência dos médios (média de 500 Hz a 2 kHz para normalizar o volume geral)
+      // Índices 14 (500Hz) a 20 (2kHz)
+      let midSum = 0;
+      let midCount = 0;
+      for (let i = 14; i <= 20; i++) {
+        midSum += measuredBands[i];
+        midCount++;
+      }
+      const refLevel = midCount > 0 ? (midSum / midCount) : -40;
+
+      const rawCorrections = new Array(31);
+      for (let i = 0; i < 31; i++) {
+        // Resposta relativa do ambiente em relação à referência
+        const relativeMeasured = measuredBands[i] - refLevel;
+        // Erro = Curva Alvo - Medido
+        const error = targetCurve[i] - relativeMeasured;
+        // Inverte para compensar
+        rawCorrections[i] = error;
+      }
+
+      // Aplica regras de segurança acústica para PA e microfones móveis:
+      const finalGains = new Array(31);
+      for (let i = 0; i < 31; i++) {
+        let gain = rawCorrections[i];
+
+        // 1. Limite de corte e boost
+        gain = Math.max(maxCut, Math.min(maxBoost, gain));
+
+        // 2. Proteção de subgraves extremos (20Hz e 25Hz):
+        // Microfones de celular cortam naturalmente abaixo de 80Hz.
+        // Nunca aplicar ganho positivo em 20 e 25Hz para não forçar amplificadores/subwoofers.
+        if (i <= 1 && gain > 0) {
+          gain = 0;
+        }
+
+        // 3. Proteção de agudos extremos (16kHz e 20kHz):
+        // Evita estresse em drivers de alta frequência
+        if (i >= 29 && gain > 0) {
+          gain = 0;
+        }
+
+        // Arredonda para 1 casa decimal (ex: +1.5 dB)
+        finalGains[i] = Math.round(gain * 10) / 10;
+      }
+
+      return finalGains;
+    }
+
+    /* ==========================================================================
+       5. INTERFACE DO USUÁRIO & GRÁFICOS (CANVAS + FADERS)
+       ========================================================================== */
+    const canvas = document.getElementById('rtaCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      renderVisualizer();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function renderVisualizer() {
+      if (!canvas.width) return;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Fundo e Linhas de Grid
+      ctx.fillStyle = '#0a0b0e';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#1e222b';
+
+      const padding = 20;
+      const graphW = w - padding * 2;
+      const graphH = h - padding * 2;
+
+      // Linhas Horizontais de dB (-15 a +15 dB)
+      const dBLabels = [12, 6, 0, -6, -12];
+      ctx.fillStyle = '#4a5568';
+      ctx.font = `${10 * window.devicePixelRatio}px monospace`;
+
+      for (const db of dBLabels) {
+        // Y proporcional: +15dB = topo (padding), -15dB = base (padding + graphH)
+        const y = padding + graphH * (1 - (db + 15) / 30);
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(w - padding, y);
+        ctx.stroke();
+
+        ctx.fillText(`${db > 0 ? '+' : ''}${db}dB`, 4, y + 3);
+      }
+
+      // Linha central 0 dB destacada
+      const zeroY = padding + graphH * 0.5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.beginPath();
+      ctx.moveTo(padding, zeroY);
+      ctx.lineTo(w - padding, zeroY);
+      ctx.stroke();
+
+      const stepX = graphW / 30;
+
+      // 1. Desenha Curva Alvo (Amarela tracejada)
+      const curveType = document.getElementById('targetCurve').value;
+      const targetCurve = TARGET_CURVES[curveType] || TARGET_CURVES.house;
+
+      ctx.beginPath();
+      ctx.setLineDash([4 * window.devicePixelRatio, 4 * window.devicePixelRatio]);
+      ctx.strokeStyle = '#ffcc00';
+      ctx.lineWidth = 2 * window.devicePixelRatio;
+
+      for (let i = 0; i < 31; i++) {
+        const x = padding + i * stepX;
+        const y = padding + graphH * (1 - (targetCurve[i] + 15) / 30);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]); // Restaura traço contínuo
+
+      // 2. Desenha Espectro Medido RTA (Azul Ciano)
+      ctx.beginPath();
+      ctx.strokeStyle = '#00d2ff';
+      ctx.lineWidth = 2.5 * window.devicePixelRatio;
+
+      // Normaliza o espectro medido visualmente para a escala de -15 a +15 dB
+      let midSum = 0;
+      for (let i = 14; i <= 20; i++) midSum += state.measuredRTA[i];
+      const ref = midSum / 7;
+
+      for (let i = 0; i < 31; i++) {
+        const x = padding + i * stepX;
+        const relVal = Math.max(-15, Math.min(15, state.measuredRTA[i] - ref));
+        const y = padding + graphH * (1 - (relVal + 15) / 30);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // 3. Desenha Barras de Correção Aplicadas (Verde / Vermelho)
+      for (let i = 0; i < 31; i++) {
+        const val = state.gainsDB[i];
+        if (Math.abs(val) > 0.1) {
+          const x = padding + i * stepX;
+          const y = padding + graphH * (1 - (val + 15) / 30);
+          ctx.fillStyle = val > 0 ? '#00e676' : '#ff5252';
+          ctx.beginPath();
+          ctx.arc(x, y, 4 * window.devicePixelRatio, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // Inicializa os 31 Faders virtuais do rack
+    function buildFadersUi() {
+      const container = document.getElementById('fadersRack');
+      container.innerHTML = '';
+
+      for (let i = 0; i < 31; i++) {
+        const freq = ISO_FREQUENCIES[i];
+        const col = document.createElement('div');
+        col.className = 'fader-col';
+        col.dataset.band = i;
+
+        col.innerHTML = `
+          <div class="fader-db" id="faderDb_${i}">0.0</div>
+          <div class="fader-track" id="faderTrack_${i}">
+            <div class="fader-center-line"></div>
+            <div class="fader-bar" id="faderBar_${i}"></div>
+            <div class="fader-thumb" id="faderThumb_${i}"></div>
+          </div>
+          <div class="fader-freq">${formatFreq(freq)}</div>
+        `;
+
+        // Interação de Arraste (Touch e Mouse)
+        const track = col.querySelector('.fader-track');
+        attachFaderDrag(track, i);
+
+        container.appendChild(col);
+      }
+      updateAllFadersUi();
+    }
+
+    function attachFaderDrag(track, index) {
+      function updateFromPointer(e) {
+        const rect = track.getBoundingClientRect();
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const offsetY = clientY - rect.top;
+        const pct = Math.max(0, Math.min(1, offsetY / rect.height));
+
+        // Topo = +15 dB, Fundo = -15 dB
+        let db = 15 - (pct * 30);
+        db = Math.round(db * 2) / 2; // Passos de 0.5 dB
+
+        state.gainsDB[index] = db;
+        updateFaderUi(index);
+        renderVisualizer();
+      }
+
+      function onStart(e) {
+        e.preventDefault();
+        updateFromPointer(e);
+
+        function onMove(ev) {
+          ev.preventDefault();
+          updateFromPointer(ev);
+        }
+
+        function onEnd() {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('mouseup', onEnd);
+          window.removeEventListener('touchmove', onMove);
+          window.removeEventListener('touchend', onEnd);
+        }
+
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', onEnd);
+      }
+
+      track.addEventListener('mousedown', onStart);
+      track.addEventListener('touchstart', onStart, { passive: false });
+    }
+
+    function updateFaderUi(i) {
+      const db = state.gainsDB[i];
+      const dbElem = document.getElementById(`faderDb_${i}`);
+      const bar = document.getElementById(`faderBar_${i}`);
+      const thumb = document.getElementById(`faderThumb_${i}`);
+
+      if (!dbElem) return;
+
+      dbElem.textContent = (db > 0 ? `+${db}` : `${db}`);
+      dbElem.className = 'fader-db' + (db > 0.1 ? ' boost' : (db < -0.1 ? ' cut' : ''));
+
+      // Posição proporcional na track (160px de altura padrão)
+      // +15dB = 0%, 0dB = 50%, -15dB = 100%
+      const pct = (15 - db) / 30; // 0 a 1
+      thumb.style.top = `${pct * 100}%`;
+
+      if (db > 0) {
+        bar.className = 'fader-bar boost';
+        bar.style.top = 'auto';
+        bar.style.bottom = '50%';
+        bar.style.height = `${(db / 15) * 50}%`;
+      } else if (db < 0) {
+        bar.className = 'fader-bar cut';
+        bar.style.bottom = 'auto';
+        bar.style.top = '50%';
+        bar.style.height = `${(Math.abs(db) / 15) * 50}%`;
+      } else {
+        bar.style.height = '0%';
+      }
+    }
+
+    function updateAllFadersUi() {
+      for (let i = 0; i < 31; i++) {
+        updateFaderUi(i);
+      }
+    }
+
+    function updateBypassUi() {
+      const elem = document.getElementById('bypassState');
+      if (elem) {
+        elem.textContent = state.isBypassed ? 'DESLIGADO' : 'LIGADO';
+        elem.style.color = state.isBypassed ? 'var(--danger)' : 'var(--success)';
+      }
+    }
+
+    function updateStatus(status, text) {
+      const badge = document.getElementById('statusBadge');
+      const label = document.getElementById('statusText');
+      badge.className = `status-badge ${status}`;
+      label.textContent = text;
+    }
+
+    function log(msg, type = 'normal') {
+      const box = document.getElementById('logBox');
+      const p = document.createElement('p');
+      p.className = type;
+      const time = new Date().toLocaleTimeString();
+      p.textContent = `[${time}] ${msg}`;
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    /* ==========================================================================
+       6. EVENT LISTENERS & FLUXO DE EXECUÇÃO
+       ========================================================================== */
+    // Botão Conectar Mesa
+    document.getElementById('btnConnect').addEventListener('click', () => {
+      const ip = document.getElementById('mixerIp').value.trim();
+      if (!ip) {
+        alert('Informe o IP da mesa Soundcraft!');
+        return;
+      }
+      if (mixer.isConnected) {
+        mixer.disconnect();
+        document.getElementById('btnConnect').textContent = 'Conectar';
+      } else {
+        mixer.connect(ip);
+        document.getElementById('btnConnect').textContent = 'Desconectar';
+      }
+    });
+
+    // Mudança de Curva Alvo
+    document.getElementById('targetCurve').addEventListener('change', () => {
+      renderVisualizer();
+    });
+
+    // Botão Iniciar Análise RTA
+    const btnStartRta = document.getElementById('btnStartRta');
+    const progressBox = document.getElementById('progressBox');
+    const progressBar = document.getElementById('progressBar');
+    const countdownTimer = document.getElementById('countdownTimer');
+
+    btnStartRta.addEventListener('click', async () => {
+      if (state.isAnalyzing) return;
+      state.isAnalyzing = true;
+
+      const duration = parseInt(document.getElementById('sampleDuration').value, 10);
+      btnStartRta.disabled = true;
+      progressBox.style.display = 'block';
+      progressBar.style.width = '0%';
+
+      log(`[RTA] Iniciando captura acústica do ruído rosa (${duration}s)...`, 'info');
+
+      try {
+        const averagedBands = await rta.startCapture(duration, (pct, remaining) => {
+          progressBar.style.width = `${pct * 100}%`;
+          countdownTimer.textContent = `Ouvindo: ${remaining}s`;
+        });
+
+        countdownTimer.textContent = 'Análise Concluída!';
+        log(`[RTA] Análise de espectro concluída com sucesso!`, 'success');
+
+        // Calcula as correções recomendadas
+        const newGains = calculateAutoEQ(averagedBands);
+        state.gainsDB = newGains;
+
+        updateAllFadersUi();
+        renderVisualizer();
+
+        log(`[Auto-Mix] 31 bandas calculadas para a curva escolhida. Revise os faders abaixo.`, 'info');
+      } catch (err) {
+        alert(`Erro ao acessar microfone: ${err.message}\nVerifique as permissões de áudio do navegador.`);
+        log(`[RTA Erro] ${err.message}`, 'error');
+      } finally {
+        state.isAnalyzing = false;
+        btnStartRta.disabled = false;
+        setTimeout(() => {
+          progressBox.style.display = 'none';
+        }, 1500);
+      }
+    });
+
+    // Botão Aplicar na Mesa Soundcraft
+    document.getElementById('btnApplyMixer').addEventListener('click', () => {
+      mixer.applyMasterGEQ(state.gainsDB);
+    });
+
+    // Botão Zerar Faders Flat
+    document.getElementById('btnResetFlat').addEventListener('click', () => {
+      state.gainsDB = new Array(31).fill(0);
+      updateAllFadersUi();
+      renderVisualizer();
+      if (mixer.isConnected) {
+        mixer.resetFlat();
+      }
+    });
+
+    // Botão Alternar Bypass
+    document.getElementById('btnToggleBypass').addEventListener('click', () => {
+      if (mixer.isConnected) {
+        mixer.toggleBypass();
+      } else {
+        state.isBypassed = !state.isBypassed;
+        updateBypassUi();
+      }
+    });
+
+    /* ==========================================================================
+       7. INICIALIZAÇÃO E SERVICE WORKER OFFLINE
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      buildFadersUi();
+      resizeCanvas();
+
+      // Verifica contexto seguro para microfone
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (!window.isSecureContext && !isLocalhost) {
+        const warn = document.getElementById('securityWarning');
+        const link = document.getElementById('btnSwitchHttps');
+        if (warn && link) {
+          link.href = `https://${window.location.hostname}:8443`;
+          warn.style.display = 'block';
+        }
+        log('[Segurança] Acesse via HTTPS (porta 8443) para liberar o microfone no celular.', 'error');
+      }
+
+      // Registro do Service Worker para suporte Offline PWA
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => log('[PWA] Cache Offline ativado via Service Worker.', 'info'))
+          .catch((err) => console.log('SW registration error:', err));
+      }
+    });
+  </script>
+</body>
+</html>
