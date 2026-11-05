@@ -599,7 +599,7 @@
     <!-- ETAPA 1: CONFIGURAÇÃO DA MIXAGEM -->
     <div class="card">
       <div class="card-title">
-        <div><span class="step-number">1</span>Curva Alvo de Referência Acústica</div>
+        <div><span class="step-number">1</span>Curva Alvo & Inteligência Acústica</div>
       </div>
       <div class="config-grid">
         <div class="form-group">
@@ -614,9 +614,30 @@
           <label for="sampleDuration">Tempo de Escuta do Ruído Rosa</label>
           <select id="sampleDuration" class="form-select">
             <option value="4">4 Segundos (Rápido)</option>
-            <option value="6" selected>6 Segundos (Recomendado - Boa Integração)</option>
-            <option value="8">8 Segundos (Ambientes Grandes / Reverberantes)</option>
-            <option value="10">10 Segundos (Máxima Precisão Acústica)</option>
+            <option value="6">6 Segundos (Padrão)</option>
+            <option value="8" selected>8 Segundos (Recomendado - Excelente Média Espacial)</option>
+            <option value="12">12 Segundos (Máxima Precisão Acústica)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="micCompensation">Calibração de Microfone</label>
+          <select id="micCompensation" class="form-select">
+            <option value="phone" selected>📱 Smartphone MEMS (Compensar corte de sub e pico de fala)</option>
+            <option value="flat">🎙️ Microfone de Medição Calibrado (Resposta Plana)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="outlierFilter">Filtro Estatístico Anti-Ruído</label>
+          <select id="outlierFilter" class="form-select">
+            <option value="yes" selected>🛡️ Rejeição de Transientes (Descarta tosse, palmas e ruídos)</option>
+            <option value="no">Desativado (Média Aritmética Simples)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="spatialSmoothing">Suavização entre Filtros</label>
+          <select id="spatialSmoothing" class="form-select">
+            <option value="yes" selected>🌊 Suavização Acústica (Evita dente-de-serra e distorção de fase)</option>
+            <option value="no">Cortes Crus (Sem suavização entre bandas)</option>
           </select>
         </div>
         <div class="form-group">
@@ -654,6 +675,21 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
           INICIAR ANÁLISE RTA
         </button>
+      </div>
+
+      <!-- MEDIDOR DE NÍVEL / VU EM TEMPO REAL -->
+      <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+        <span style="color: var(--text-muted); font-weight: 600; white-space: nowrap;">Nível Mic:</span>
+        <div style="flex: 1; height: 8px; background: #14171d; border-radius: 4px; overflow: hidden; position: relative;">
+          <div id="vuMeterFill" style="height: 100%; width: 0%; background: #00e676; transition: width 0.05s ease, background 0.1s;"></div>
+        </div>
+        <span id="vuMeterText" style="font-family: monospace; font-weight: bold; width: 140px; text-align: right; color: var(--text-muted);">Aguardando...</span>
+      </div>
+
+      <!-- DICA DE MOVING MIC METHOD (MMM) -->
+      <div style="background: rgba(0, 210, 255, 0.07); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 12px; color: #bdeaff; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">💡</span>
+        <span><strong>Técnica dos Engenheiros de PA (Moving Mic Method):</strong> Enquanto a contagem regressiva rodar, movimente o celular suavemente em círculos na altura dos seus ouvidos. Isso faz a média espacial da sala e elimina nós acústicos falsos.</span>
       </div>
 
       <div id="progressBox" class="progress-box">
@@ -702,6 +738,9 @@
           </button>
           <button id="btnToggleBypass" class="btn">
             Bypass EQ: <strong id="bypassState" style="color: var(--success); margin-left: 4px;">LIGADO</strong>
+          </button>
+          <button id="btnABTest" class="btn" style="background: rgba(255, 153, 0, 0.15); border-color: rgba(255, 153, 0, 0.4); color: var(--accent);">
+            🎧 Comparar A/B: <strong id="abStateLabel" style="color: #fff; margin-left: 4px;">COM EQUALIZAÇÃO</strong>
           </button>
         </div>
 
@@ -757,6 +796,14 @@
         1.0, 0.5, 0, 0, 0, -1.0, -2.0, -3.5, -5.0, -7.0, -9.0
       ]
     };
+
+    // Curva de Calibração / Compensação para Microfones MEMS de Smartphones:
+    // Compensa a atenuação física abaixo de 80Hz e o pico de ressonância em 2.5kHz - 4kHz
+    const PHONE_MIC_COMPENSATION = [
+      -12.0, -10.0, -8.0, -6.0, -4.0, -2.5, -1.5, -0.8, -0.3, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.6,
+      1.0, 1.8, 2.2, 2.0, 1.5, 0.8, 0.0, -0.5, -1.5, -3.0, -6.0
+    ];
 
     // Estado Atual do App
     const state = {
@@ -1003,7 +1050,26 @@
         }
       }
 
-      // Lê a energia instantânea em dB para cada uma das 31 bandas
+      // Lê os níveis gerais em tempo real (RMS e Pico para detecção de Clipping)
+      getAudioLevels() {
+        if (!this.analyser) return { rmsDB: -100, peakDB: -100, isClipping: false };
+        const timeData = new Float32Array(this.analyser.fftSize);
+        this.analyser.getFloatTimeDomainData(timeData);
+        let sumSquare = 0;
+        let peak = 0;
+        for (let i = 0; i < timeData.length; i++) {
+          const val = timeData[i];
+          const abs = Math.abs(val);
+          if (abs > peak) peak = abs;
+          sumSquare += val * val;
+        }
+        const rms = Math.sqrt(sumSquare / timeData.length);
+        const rmsDB = rms > 0 ? 20 * Math.log10(rms) : -100;
+        const peakDB = peak > 0 ? 20 * Math.log10(peak) : -100;
+        return { rmsDB, peakDB, isClipping: peak >= 0.98 };
+      }
+
+      // Lê a energia acústica instantânea em cada uma das 31 bandas de 1/3 de oitava
       getInstantBands() {
         this.analyser.getFloatFrequencyData(this.buffer);
         const bands = new Float32Array(31);
@@ -1011,18 +1077,17 @@
         for (let i = 0; i < 31; i++) {
           const { binStart, binEnd } = this.bandBins[i];
           let sumPower = 0;
-          let count = 0;
 
           for (let b = binStart; b <= binEnd; b++) {
             const dbVal = this.buffer[b];
             if (isFinite(dbVal)) {
               sumPower += Math.pow(10, dbVal / 10);
-              count++;
             }
           }
 
-          if (count > 0 && sumPower > 0) {
-            bands[i] = 10 * Math.log10(sumPower / count);
+          // Integração proporcional acústica exata (sem divisão por count)
+          if (sumPower > 0) {
+            bands[i] = 10 * Math.log10(sumPower);
           } else {
             bands[i] = -100;
           }
@@ -1030,7 +1095,7 @@
         return bands;
       }
 
-      // Grava e tira a média espacial durante os segundos determinados
+      // Grava e tira a média espacial com rejeição estatística de anomalias (Trimmed-Mean)
       async startCapture(durationSeconds, onProgress) {
         await this.init();
 
@@ -1038,12 +1103,45 @@
         const intervalMs = 50; // ~20 frames por segundo
         const totalFrames = Math.round((durationSeconds * 1000) / intervalMs);
         let frameCount = 0;
+        let clippingCount = 0;
+        let totalRMS = 0;
+
+        const vuFill = document.getElementById('vuMeterFill');
+        const vuText = document.getElementById('vuMeterText');
 
         return new Promise((resolve) => {
           const timer = setInterval(() => {
             const instant = this.getInstantBands();
+            const levels = this.getAudioLevels();
             samples.push(instant);
             frameCount++;
+            totalRMS += levels.rmsDB;
+            if (levels.isClipping) clippingCount++;
+
+            // Atualiza VU Meter na tela
+            if (vuFill && vuText) {
+              const clampedRMS = Math.max(-60, Math.min(0, levels.rmsDB));
+              const pct = ((clampedRMS + 60) / 60) * 100;
+              vuFill.style.width = `${pct}%`;
+
+              if (levels.isClipping) {
+                vuFill.style.background = '#ff5252';
+                vuText.style.color = '#ff5252';
+                vuText.textContent = `🔴 CLIPPING (${levels.peakDB.toFixed(1)} dB)`;
+              } else if (levels.rmsDB > -15) {
+                vuFill.style.background = '#ffcc00';
+                vuText.style.color = '#ffcc00';
+                vuText.textContent = `🟡 Forte (${levels.rmsDB.toFixed(1)} dB)`;
+              } else if (levels.rmsDB > -45) {
+                vuFill.style.background = '#00e676';
+                vuText.style.color = '#00e676';
+                vuText.textContent = `🟢 Ideal (${levels.rmsDB.toFixed(1)} dB)`;
+              } else {
+                vuFill.style.background = '#4a5568';
+                vuText.style.color = '#8e95a5';
+                vuText.textContent = `⚠️ Fraco (${levels.rmsDB.toFixed(1)} dB)`;
+              }
+            }
 
             // Atualiza visualização em tempo real
             state.measuredRTA = instant;
@@ -1056,14 +1154,37 @@
             if (frameCount >= totalFrames) {
               clearInterval(timer);
 
-              // Calcula média energética em cada banda
+              const avgRMS = totalRMS / samples.length;
+              if (avgRMS < -50) {
+                log(`[Aviso Acústico] Nível de sinal fraco (${avgRMS.toFixed(1)} dBFS). O ruído rosa estava realmente tocando?`, 'error');
+              }
+              if (clippingCount > 2) {
+                log(`[Aviso Acústico] O microfone atingiu saturação (Clipping) em ${clippingCount} momentos. Se puder, refaça abaixando um pouco o som da mesa.`, 'error');
+              }
+
+              // FILTRO ESTATÍSTICO (TRIMMED-MEAN):
+              // Remove 15% das amostras extremas (maiores e menores) em cada banda para descartar tosse, palmas ou eco súbito
+              const useFilter = document.getElementById('outlierFilter').value === 'yes';
               const averaged = new Float32Array(31);
+
               for (let b = 0; b < 31; b++) {
-                let sumPower = 0;
-                for (let s = 0; s < samples.length; s++) {
-                  sumPower += Math.pow(10, samples[s][b] / 10);
+                const bandVals = samples.map(s => s[b]).sort((x, y) => x - y);
+                let startIdx = 0;
+                let endIdx = bandVals.length;
+
+                if (useFilter && bandVals.length >= 20) {
+                  const trim = Math.floor(bandVals.length * 0.15);
+                  startIdx = trim;
+                  endIdx = bandVals.length - trim;
                 }
-                averaged[b] = 10 * Math.log10(sumPower / samples.length);
+
+                let sumPower = 0;
+                let count = 0;
+                for (let s = startIdx; s < endIdx; s++) {
+                  sumPower += Math.pow(10, bandVals[s] / 10);
+                  count++;
+                }
+                averaged[b] = 10 * Math.log10(sumPower / count);
               }
 
               resolve(averaged);
@@ -1081,56 +1202,81 @@
     function calculateAutoEQ(measuredBands) {
       const curveType = document.getElementById('targetCurve').value;
       const targetCurve = TARGET_CURVES[curveType] || TARGET_CURVES.house;
+      const micComp = document.getElementById('micCompensation').value;
+      const useSmoothing = document.getElementById('spatialSmoothing').value === 'yes';
 
       const maxBoost = parseFloat(document.getElementById('maxBoost').value);
       const maxCut = parseFloat(document.getElementById('maxCut').value);
 
-      // Referência dos médios (média de 500 Hz a 2 kHz para normalizar o volume geral)
-      // Índices 14 (500Hz) a 20 (2kHz)
+      // 1. Aplica compensação acústica do microfone do celular (se ativada)
+      const compensatedMeasured = new Float32Array(31);
+      for (let i = 0; i < 31; i++) {
+        const offset = (micComp === 'phone') ? PHONE_MIC_COMPENSATION[i] : 0;
+        compensatedMeasured[i] = measuredBands[i] - offset;
+      }
+
+      // 2. Referência dos médios (média de 500 Hz a 2 kHz para ancorar o 0 dB)
       let midSum = 0;
       let midCount = 0;
       for (let i = 14; i <= 20; i++) {
-        midSum += measuredBands[i];
+        midSum += compensatedMeasured[i];
         midCount++;
       }
       const refLevel = midCount > 0 ? (midSum / midCount) : -40;
 
+      // 3. Calcula o erro relativo em relação à curva alvo
       const rawCorrections = new Array(31);
       for (let i = 0; i < 31; i++) {
-        // Resposta relativa do ambiente em relação à referência
-        const relativeMeasured = measuredBands[i] - refLevel;
-        // Erro = Curva Alvo - Medido
-        const error = targetCurve[i] - relativeMeasured;
-        // Inverte para compensar
-        rawCorrections[i] = error;
+        const relativeMeasured = compensatedMeasured[i] - refLevel;
+        // Correção = Alvo - Medido
+        rawCorrections[i] = targetCurve[i] - relativeMeasured;
       }
 
-      // Aplica regras de segurança acústica para PA e microfones móveis:
-      const finalGains = new Array(31);
+      // 4. Limites de segurança acústica
+      let gains = new Array(31);
       for (let i = 0; i < 31; i++) {
         let gain = rawCorrections[i];
-
-        // 1. Limite de corte e boost
         gain = Math.max(maxCut, Math.min(maxBoost, gain));
 
-        // 2. Proteção de subgraves extremos (20Hz e 25Hz):
-        // Microfones de celular cortam naturalmente abaixo de 80Hz.
-        // Nunca aplicar ganho positivo em 20 e 25Hz para não forçar amplificadores/subwoofers.
-        if (i <= 1 && gain > 0) {
-          gain = 0;
-        }
+        // Proteção contra queima e excursão inaudível em subgraves extremos
+        if (i <= 1 && gain > 0) gain = 0;
+        // Proteção de drivers de alta frequência
+        if (i >= 29 && gain > 0) gain = 0;
 
-        // 3. Proteção de agudos extremos (16kHz e 20kHz):
-        // Evita estresse em drivers de alta frequência
-        if (i >= 29 && gain > 0) {
-          gain = 0;
-        }
-
-        // Arredonda para 1 casa decimal (ex: +1.5 dB)
-        finalGains[i] = Math.round(gain * 10) / 10;
+        gains[i] = gain;
       }
 
-      return finalGains;
+      // 5. Suavização Espacial e Limitação de Inclinação (Anti Dente-de-Serra)
+      if (useSmoothing) {
+        // Limita o salto máximo entre duas bandas vizinhas a 3.5 dB
+        for (let pass = 0; pass < 2; pass++) {
+          for (let i = 0; i < 30; i++) {
+            const diff = gains[i + 1] - gains[i];
+            if (Math.abs(diff) > 3.5) {
+              gains[i + 1] = diff > 0 ? gains[i] + 3.5 : gains[i] - 3.5;
+            }
+          }
+          for (let i = 30; i > 0; i--) {
+            const diff = gains[i - 1] - gains[i];
+            if (Math.abs(diff) > 3.5) {
+              gains[i - 1] = diff > 0 ? gains[i] + 3.5 : gains[i] - 3.5;
+            }
+          }
+        }
+
+        // Filtro passa-baixa espacial 3-pontos [0.2, 0.6, 0.2] para coerência de fase
+        const smoothed = new Array(31);
+        for (let i = 0; i < 31; i++) {
+          const prev = i > 0 ? gains[i - 1] : gains[i];
+          const curr = gains[i];
+          const next = i < 30 ? gains[i + 1] : gains[i];
+          smoothed[i] = 0.2 * prev + 0.6 * curr + 0.2 * next;
+        }
+        gains = smoothed;
+      }
+
+      // 6. Arredonda para 1 casa decimal
+      return gains.map(g => Math.round(g * 10) / 10);
     }
 
     /* ==========================================================================
@@ -1469,6 +1615,30 @@
         updateBypassUi();
       }
     });
+
+    // Botão Comparar A/B
+    const btnABTest = document.getElementById('btnABTest');
+    const abStateLabel = document.getElementById('abStateLabel');
+    if (btnABTest && abStateLabel) {
+      btnABTest.addEventListener('click', () => {
+        if (!mixer.isConnected) {
+          alert('Conecte à mesa para realizar o teste comparativo A/B ao vivo no som!');
+          return;
+        }
+        mixer.toggleBypass();
+        if (state.isBypassed) {
+          abStateLabel.textContent = 'FLAT (BYPASS)';
+          abStateLabel.style.color = 'var(--danger)';
+          btnABTest.style.borderColor = 'var(--danger)';
+          log('[A/B Teste] Ouvindo em FLAT (Bypass ativo)', 'info');
+        } else {
+          abStateLabel.textContent = 'COM EQUALIZAÇÃO';
+          abStateLabel.style.color = '#fff';
+          btnABTest.style.borderColor = 'rgba(255, 153, 0, 0.4)';
+          log('[A/B Teste] Ouvindo com AUTO-EQ APLICADO', 'success');
+        }
+      });
+    }
 
     /* ==========================================================================
        7. INICIALIZAÇÃO E SERVICE WORKER OFFLINE
