@@ -35,545 +35,138 @@
       --text-muted: #8e95a5;
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: var(--font-family);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
+      background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-family);
+      min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
       padding-bottom: calc(30px + env(safe-area-inset-bottom));
     }
-
-    /* HEADER & STATUS BAR */
     header {
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--border-color);
-      padding: 12px 18px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      background: var(--bg-panel); border-bottom: 1px solid var(--border-color);
+      padding: 12px 18px; display: flex; flex-wrap: wrap; align-items: center;
+      justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 100;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+    .brand { display: flex; align-items: center; gap: 10px; }
     .brand-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, #00d2ff, #0055ff);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 16px;
-      color: #fff;
+      width: 32px; height: 32px; background: linear-gradient(135deg, #00d2ff, #0055ff);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 16px; color: #fff;
     }
-
-    .brand h1 {
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .brand span {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: block;
-    }
-
-    .connection-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
+    .brand h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.5px; }
+    .brand span { font-size: 11px; color: var(--text-muted); display: block; }
+    .connection-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .ip-input {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 7px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      width: 125px;
-      font-family: monospace;
-      outline: none;
-      transition: border-color 0.2s;
+      background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
+      padding: 7px 12px; border-radius: 6px; font-size: 13px; width: 125px; font-family: monospace;
+      outline: none; transition: border-color 0.2s;
     }
-
-    .ip-input:focus {
-      border-color: var(--primary);
-    }
-
+    .ip-input:focus { border-color: var(--primary); }
     .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      background: rgba(255, 82, 82, 0.15);
-      color: var(--danger);
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+      background: rgba(255, 82, 82, 0.15); color: var(--danger);
       border: 1px solid rgba(255, 82, 82, 0.3);
     }
-
-    .status-badge.connected {
-      background: rgba(0, 230, 118, 0.15);
-      color: var(--success);
-      border-color: rgba(0, 230, 118, 0.3);
-    }
-
-    .status-badge.connecting {
-      background: rgba(255, 153, 0, 0.15);
-      color: var(--accent);
-      border-color: rgba(255, 153, 0, 0.3);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-
-    /* BUTTONS */
+    .status-badge.connected { background: rgba(0, 230, 118, 0.15); color: var(--success); border-color: rgba(0, 230, 118, 0.3); }
+    .status-badge.connecting { background: rgba(255, 153, 0, 0.15); color: var(--accent); border-color: rgba(255, 153, 0, 0.3); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
     .btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s;
+      background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
+      padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;
     }
-
-    .btn:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--text-muted);
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #00b4db, #0083b0);
-      border: none;
-      color: #fff;
-      box-shadow: 0 2px 10px var(--primary-glow);
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #00c6ee, #0099cc);
-    }
-
+    .btn:hover { background: var(--bg-card-hover); border-color: var(--text-muted); }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: linear-gradient(135deg, #00b4db, #0083b0); border: none; color: #fff; box-shadow: 0 2px 10px var(--primary-glow); }
+    .btn-primary:hover { background: linear-gradient(135deg, #00c6ee, #0099cc); }
     .btn-action {
-      background: linear-gradient(135deg, #00e676, #00a854);
-      border: none;
-      color: #121316;
-      font-weight: 800;
-      font-size: 15px;
-      padding: 14px 24px;
-      border-radius: 8px;
+      background: linear-gradient(135deg, #00e676, #00a854); border: none; color: #121316;
+      font-weight: 800; font-size: 15px; padding: 14px 24px; border-radius: 8px;
       box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
     }
-
-    .btn-action:hover {
-      background: linear-gradient(135deg, #1aff8c, #00c261);
-    }
-
+    .btn-action:hover { background: linear-gradient(135deg, #1aff8c, #00c261); }
     .btn-apply {
-      background: linear-gradient(135deg, #ff9900, #e67300);
-      border: none;
-      color: #fff;
-      font-weight: 800;
-      font-size: 15px;
-      padding: 14px 24px;
-      border-radius: 8px;
+      background: linear-gradient(135deg, #ff9900, #e67300); border: none; color: #fff;
+      font-weight: 800; font-size: 15px; padding: 14px 24px; border-radius: 8px;
       box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
     }
-
-    .btn-apply:hover {
-      background: linear-gradient(135deg, #ffa826, #f27c00);
-    }
-
-    .btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
-    }
-
-    /* MAIN CONTAINER */
-    main {
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* CARDS */
-    .card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    }
-
+    .btn-apply:hover { background: linear-gradient(135deg, #ffa826, #f27c00); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    main { max-width: 1400px; width: 100%; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); }
     .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--text-muted); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
     }
-
     .card-title span.step-number {
-      background: var(--primary);
-      color: #0f1013;
-      border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 800;
-      margin-right: 8px;
+      background: var(--primary); color: #0f1013; border-radius: 50%; width: 22px; height: 22px;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 12px;
+      font-weight: 800; margin-right: 8px;
     }
-
-    /* CONFIG ROW */
-    .config-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
+    .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
     .form-select {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
+      background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
+      padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer;
     }
-
-    .form-select:focus {
-      border-color: var(--primary);
-    }
-
-    /* ACTION BAR */
+    .form-select:focus { border-color: var(--primary); }
     .action-container {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      background: var(--bg-card);
-      padding: 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 14px; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);
     }
-
-    .action-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .action-info strong {
-      font-size: 15px;
-      color: #fff;
-    }
-
-    .action-info span {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    /* COUNTDOWN & PROGRESS BAR */
-    .progress-box {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 10px;
-      display: none;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #00d2ff, #00e676);
-      transition: width 0.1s linear;
-    }
-
-    /* VISUALIZER CANVAS */
-    .visualizer-wrapper {
-      position: relative;
-      background: #0a0b0e;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    canvas#rtaCanvas {
-      width: 100%;
-      height: 220px;
-      display: block;
-    }
-
-    .legend {
-      display: flex;
-      gap: 16px;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .legend-color {
-      width: 12px;
-      height: 3px;
-      border-radius: 2px;
-    }
-
-    /* 31 FADERS RACK */
+    .action-info { display: flex; flex-direction: column; gap: 4px; }
+    .action-info strong { font-size: 15px; color: #fff; }
+    .action-info span { font-size: 12px; color: var(--text-muted); }
+    .progress-box { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; margin-top: 10px; display: none; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #00e676); transition: width 0.1s linear; }
+    .visualizer-wrapper { position: relative; background: #0a0b0e; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+    canvas#rtaCanvas { width: 100%; height: 220px; display: block; }
+    .legend { display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); margin-top: 8px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-color { width: 12px; height: 3px; border-radius: 2px; }
     .faders-container {
-      display: grid;
-      grid-template-columns: repeat(31, 1fr);
-      gap: 3px;
-      background: #0a0b0e;
-      padding: 14px 6px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      overflow-x: auto;
-      min-width: 0;
+      display: grid; grid-template-columns: repeat(31, 1fr); gap: 3px; background: #0a0b0e;
+      padding: 14px 6px; border-radius: 8px; border: 1px solid var(--border-color);
+      overflow-x: auto; min-width: 0;
     }
-
-    .fader-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      min-width: 26px;
-    }
-
-    .fader-db {
-      font-size: 9px;
-      font-weight: 700;
-      font-family: monospace;
-      color: var(--text-muted);
-      height: 14px;
-      text-align: center;
-    }
-
-    .fader-db.boost {
-      color: var(--primary);
-    }
-
-    .fader-db.cut {
-      color: var(--accent);
-    }
-
-    .fader-track {
-      position: relative;
-      width: 16px;
-      height: 160px;
-      background: #14171d;
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: default;
-      pointer-events: none;
-    }
-
-    .fader-center-line {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    .fader-bar {
-      position: absolute;
-      width: 8px;
-      border-radius: 2px;
-      left: 4px;
-    }
-
-    .fader-bar.boost {
-      background: linear-gradient(to top, #00b4db, #00e676);
-      bottom: 50%;
-    }
-
-    .fader-bar.cut {
-      background: linear-gradient(to bottom, #ff9900, #ff5252);
-      top: 50%;
-    }
-
-    .fader-thumb {
-      position: absolute;
-      left: 1px;
-      right: 1px;
-      height: 10px;
-      background: #e2e8f0;
-      border-radius: 2px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.8);
-      pointer-events: none;
-      transform: translateY(-50%);
-    }
-
-    .fader-freq {
-      font-size: 8.5px;
-      font-family: monospace;
-      color: var(--text-muted);
-      text-align: center;
-      white-space: nowrap;
-      margin-top: 4px;
-    }
-
-    /* FOOTER CONTROLS & LOG */
-    .controls-footer {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .log-box {
-      background: #08090b;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-family: monospace;
-      font-size: 11px;
-      color: #94a3b8;
-      max-height: 80px;
-      overflow-y: auto;
-      width: 100%;
-    }
-
-    .log-box p {
-      margin-bottom: 3px;
-    }
-
-    .log-box p.success {
-      color: var(--success);
-    }
-
-    .log-box p.error {
-      color: var(--danger);
-    }
-
-    .log-box p.info {
-      color: var(--primary);
-    }
-
-    .diagnostics {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
+    .fader-col { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 26px; }
+    .fader-db { font-size: 9px; font-weight: 700; font-family: monospace; color: var(--text-muted); height: 14px; text-align: center; }
+    .fader-db.boost { color: var(--primary); }
+    .fader-db.cut { color: var(--accent); }
+    .fader-track { position: relative; width: 16px; height: 160px; background: #14171d; border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: default; pointer-events: none; }
+    .fader-center-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.25); }
+    .fader-bar { position: absolute; width: 8px; border-radius: 2px; left: 4px; }
+    .fader-bar.boost { background: linear-gradient(to top, #00b4db, #00e676); bottom: 50%; }
+    .fader-bar.cut { background: linear-gradient(to bottom, #ff9900, #ff5252); top: 50%; }
+    .fader-thumb { position: absolute; left: 1px; right: 1px; height: 10px; background: #e2e8f0; border-radius: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.8); pointer-events: none; transform: translateY(-50%); }
+    .fader-freq { font-size: 8.5px; font-family: monospace; color: var(--text-muted); text-align: center; white-space: nowrap; margin-top: 4px; }
+    .controls-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+    .log-box { background: #08090b; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px; font-family: monospace; font-size: 11px; color: #94a3b8; max-height: 80px; overflow-y: auto; width: 100%; }
+    .log-box p { margin-bottom: 3px; }
+    .log-box p.success { color: var(--success); }
+    .log-box p.error { color: var(--danger); }
+    .log-box p.info { color: var(--primary); }
+    .diagnostics { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; color: var(--text-muted); font-size: 12px; }
     .diagnostics summary { cursor: pointer; font-weight: 600; }
     .diagnostics .log-box { margin-top: 10px; }
     input[type="file"].form-select { padding: 7px; max-width: 100%; }
-
-    /* RESPONSIVE */
+    .checkbox-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.18); border-radius: 6px; }
+    .checkbox-row input { margin-top: 2px; }
+    .checkbox-row label { color: var(--text-main); font-weight: 600; cursor: pointer; }
     @media (max-width: 768px) {
-      header {
-        padding: 10px 14px;
-      }
-      .brand h1 {
-        font-size: 15px;
-      }
-      .btn-action, .btn-apply {
-        width: 100%;
-        padding: 14px;
-      }
-      .faders-container {
-        padding: 10px 4px;
-      }
-      .fader-col {
-        min-width: 24px;
-      }
-      .fader-track {
-        height: 130px;
-        width: 14px;
-      }
+      header { padding: 10px 14px; }
+      .brand h1 { font-size: 15px; }
+      .btn-action, .btn-apply { width: 100%; padding: 14px; }
+      .faders-container { padding: 10px 4px; }
+      .fader-col { min-width: 24px; }
+      .fader-track { height: 130px; width: 14px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="brand">
       <div class="brand-icon">Ui</div>
@@ -582,7 +175,6 @@
         <span>Master 31-Band GEQ Calibration</span>
       </div>
     </div>
-
     <div class="connection-bar">
       <div id="statusBadge" class="status-badge">
         <span class="status-dot"></span>
@@ -590,28 +182,23 @@
       </div>
       <input type="text" id="mixerIp" class="ip-input" value="10.10.1.1" placeholder="IP da Mesa">
       <button id="btnConnect" class="btn btn-primary">Conectar</button>
-      <button id="btnInstall" class="btn btn-primary" title="Instalar aplicativo no celular" style="display: none; padding: 7px 10px; font-size: 11px;">
-        📲 Instalar
-      </button>
+      <button id="btnInstall" class="btn btn-primary" title="Instalar aplicativo no celular" style="display: none; padding: 7px 10px; font-size: 11px;">📲 Instalar</button>
     </div>
   </header>
 
-  <!-- AVISO DE CONTEXTO SEGURO / HTTPS -->
   <div id="securityWarning" style="display: none; background: #3b2204; border-bottom: 1px solid #ff9900; padding: 12px 18px; color: #ffcc66; font-size: 13px;">
     <strong>Microfone indisponível neste endereço.</strong>
     <p style="margin-top: 4px; color: #ffdf99; line-height: 1.4;">
       O navegador exige HTTPS ou localhost para liberar o microfone. Em páginas HTTPS, a conexão local ws:// com a mesa também pode ser bloqueada pelo navegador; prefira uma implantação local segura, sem liberar conteúdo inseguro globalmente.
     </p>
   </div>
-
   <div id="mixedContentTip" style="display: none; background: #152233; border-bottom: 1px solid #00d2ff; padding: 10px 18px; color: #bdeaff; font-size: 12px;">
     A conexão WebSocket com a mesa falhou. Verifique o IP, a mesma rede local e as restrições de conteúdo misto do navegador.
   </div>
 
-  <!-- MAIN CONTENT -->
   <main>
 
-    <!-- ETAPA 1: CONFIGURAÇÃO DA MIXAGEM -->
+    <!-- ETAPA 1 -->
     <div class="card">
       <div class="card-title">
         <div><span class="step-number">1</span>Referência e microfone</div>
@@ -621,7 +208,7 @@
           <label for="targetCurve">Curva de referência</label>
           <select id="targetCurve" class="form-select">
             <option value="flat" selected>Resposta Flat (referência neutra)</option>
-            <option value="house">House suave (referência subjetiva)</option>
+            <option value="house">House (warmth em graves + rolloff em agudos)</option>
           </select>
         </div>
         <div class="form-group">
@@ -629,6 +216,7 @@
           <select id="sampleDuration" class="form-select">
             <option value="20">20 segundos</option>
             <option value="30" selected>30 segundos (recomendado)</option>
+            <option value="45">45 segundos</option>
           </select>
         </div>
         <div class="form-group">
@@ -641,16 +229,20 @@
           <small id="micCalibrationStatus" style="color:var(--text-muted);font-size:11px;line-height:1.35;">Sem arquivo: medição estimada, sem compensação individual.</small>
         </div>
       </div>
-      <p style="margin-top:12px;color:var(--text-muted);font-size:11px;line-height:1.45;">
-        Use a curva individual do microfone (duas colunas: frequência em Hz e correção em dB a somar à leitura). Ela corrige resposta em frequência; não calibra SPL.
-        Sem curva individual, o Auto-EQ fica limitado a uma faixa provisória e exige confirmação antes do envio.
+
+      <div class="checkbox-row" style="margin-top:14px;">
+        <input type="checkbox" id="phoneHeuristic">
+        <label for="phoneHeuristic">Compensação heurística de microfone de celular <span style="color:var(--primary);">(recomendado se não houver curva individual)</span></label>
+      </div>
+      <p style="margin-top:8px;color:var(--text-muted);font-size:11px;line-height:1.45;">
+        Aplica correção parcial (≈ 60 %) do rolloff típico de MEMS de celular abaixo de 160 Hz. Extende a faixa útil até ~50 Hz, mantendo o algoritmo conservador acima disso. <strong>Não substitui uma curva individual:</strong> use-a sempre que possível.
       </p>
       <div style="margin-top:10px;padding:10px 12px;border:1px solid var(--border-color);border-radius:6px;color:var(--text-muted);font-size:11px;line-height:1.45;">
-        <strong>Correção automática conservadora:</strong> somente cortes de até 6 dB, com zona morta de 1,5 dB. Não tenta preencher cancelamentos acústicos com boosts.
+        <strong>Correção automática:</strong> cortes de até <strong>−12 dB</strong> em picos; boosts de até <strong>+4 dB</strong> apenas em vales largos (≥ 3 bandas); limite global de <strong>+8 dB</strong>. Zona morta de <strong>1,0 dB</strong>.
       </div>
     </div>
 
-    <!-- ETAPA 2: CAPTURA E ANÁLISE DO RUÍDO ROSA -->
+    <!-- ETAPA 2 -->
     <div class="card">
       <div class="card-title">
         <div><span class="step-number">2</span>Captura RTA em Tempo Real (Microfone)</div>
@@ -677,9 +269,9 @@
         <span id="posCount" style="font-family:monospace;color:var(--primary);">0 regiões medidas</span>
         <button id="btnClearPos" class="btn" style="padding:6px 10px;font-size:11px;">Limpar medições</button>
       </div>
-      <!-- MEDIDOR DE NÍVEL / VU EM TEMPO REAL -->
+
       <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
-          <span style="color: var(--text-muted); font-weight: 600; white-space: nowrap;">Entrada (dBFS):</span>
+        <span style="color: var(--text-muted); font-weight: 600; white-space: nowrap;">Entrada (dBFS):</span>
         <div style="flex: 1; height: 8px; background: #14171d; border-radius: 4px; overflow: hidden; position: relative;">
           <div id="vuMeterFill" style="height: 100%; width: 0%; background: #00e676; transition: width 0.05s ease, background 0.1s;"></div>
         </div>
@@ -687,7 +279,7 @@
       </div>
 
       <div style="background: rgba(0, 210, 255, 0.07); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 12px; color: #bdeaff; line-height:1.45;">
-        <strong>Média espacial:</strong> faça 3 a 5 capturas em regiões distintas da plateia, à altura dos ouvidos. Em cada captura, mova o microfone lentamente e de forma contínua. Mantenha o nível do ruído rosa constante e evite ficar junto a paredes ou caixas. Quando o ruído de fundo for medido, cada banda só usa capturas com SNR de pelo menos 10 dB; mais da metade das regiões precisa passar.
+        <strong>Média espacial:</strong> faça 3 a 5 capturas em regiões distintas da plateia, à altura dos ouvidos. Em cada captura, mova o microfone lentamente e de forma contínua. Mantenha o nível do ruído rosa constante e evite ficar junto a paredes ou caixas.
       </div>
 
       <div id="progressBox" class="progress-box">
@@ -699,32 +291,20 @@
       </div>
 
       <div class="legend">
-        <div class="legend-item">
-          <div class="legend-color" style="background: #00d2ff;"></div>
-          <span>Resposta medida (com correção disponível)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: #ffcc00; border-top: 1px dashed #ffcc00;"></div>
-          <span>Curva de referência</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background: #ff5252;"></div>
-          <span>Corte sugerido</span>
-        </div>
+        <div class="legend-item"><div class="legend-color" style="background: #00d2ff;"></div><span>Resposta medida</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #ffcc00; border-top: 1px dashed #ffcc00;"></div><span>Curva de referência</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #00e676; border-top: 1px dashed #00e676;"></div><span>Resposta prevista pós‑EQ</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #ff5252;"></div><span>Ajuste aplicado</span></div>
       </div>
     </div>
 
-    <!-- ETAPA 3: EQUALIZADOR GRÁFICO DE 31 BANDAS DO MASTER -->
+    <!-- ETAPA 3 -->
     <div class="card">
       <div class="card-title">
         <div><span class="step-number">3</span>Sugestões para o GEQ Master (31 bandas)</div>
         <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Somente leitura · revise antes de aplicar</span>
       </div>
-
-      <div id="fadersRack" class="faders-container">
-        <!-- 31 Faders serão gerados dinamicamente via JS -->
-      </div>
-
+      <div id="fadersRack" class="faders-container"></div>
       <div class="controls-footer">
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="btnResetFlat" class="btn">Zerar GEQ do Master</button>
@@ -733,7 +313,6 @@
             Bypass do EQ: <strong id="bypassState" style="color: var(--success); margin-left: 4px;">INATIVO</strong>
           </button>
         </div>
-
         <button id="btnApplyMixer" class="btn btn-apply" disabled>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           APLICAR CORREÇÕES NO MASTER L/R
@@ -752,7 +331,7 @@
 
   <script>
     /* ==========================================================================
-       1. CONSTANTES E CONFIGURAÇÕES DE ÁUDIO (31 BANDAS ISO)
+       1. CONSTANTES
        ========================================================================== */
     const ISO_FREQUENCIES = [
       20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160,
@@ -760,42 +339,50 @@
       2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000
     ];
 
-    // Formatação amigável das frequências
     function formatFreq(hz) {
-      if (hz >= 1000) {
-        return (hz / 1000) + 'k';
-      }
-      return hz.toString();
+      return hz >= 1000 ? (hz / 1000) + 'k' : hz.toString();
     }
 
-    // Curvas de referência relativas. Flat é a opção neutra; House é apenas uma preferência tonal.
+    // House: leve warmth em graves + rolloff em agudos (perfil típico de PA).
     const TARGET_CURVES = {
       flat: new Array(31).fill(0),
       house: [
-        0.0, 0.0, 0.3, 0.6, 0.9, 1.0, 0.9, 0.6, 0.3, 0.2,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, -0.1, -0.2, -0.4, -0.6, -0.8, -1.0, -1.3, -1.6, -2.0, -2.5
+         1.0,  1.0,  0.9,  0.8,  0.6,  0.5,  0.3,  0.2,  0.1,  0.0,
+         0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+         0.0, -0.1, -0.2, -0.3, -0.5, -0.7, -0.9, -1.2, -1.5, -1.8, -2.2
       ]
     };
 
-    // Limites deliberadamente conservadores para uma medição sem curva individual.
-    const UNCALIBRATED_MIN_HZ = 125;
-    const UNCALIBRATED_MAX_HZ = 8000;
-    const MIN_SNR_DB = 10;
-    const MAX_AUTO_CUT_DB = -6;
-    const AUTO_EQ_DEADBAND_DB = 1.5;
-    const TEMPORAL_TRIM_FRACTION = 0.10;
+    // Limites do algoritmo (mais próximos do que um profissional faz na prática)
+    const UNCALIBRATED_MIN_HZ       = 125;   // sem nenhuma compensação
+    const UNCALIBRATED_MIN_HZ_HEUR  = 50;    // com heurística de celular
+    const UNCALIBRATED_MAX_HZ       = 8000;
+    const MIN_SNR_DB                = 10;
+    const MAX_AUTO_CUT_DB           = -12;   // era -6
+    const MAX_AUTO_BOOST_DB         =  4;
+    const MAX_TOTAL_BOOST_DB        =  8;
+    const AUTO_EQ_DEADBAND_DB       =  1.0;  // era 1.5
+    const TEMPORAL_TRIM_FRACTION    =  0.10;
 
-    // Estado Atual do App
+    // Compensação heurística de rolloff típico de celular (a SOMAR à leitura)
+    // MEMS de celular tipicamente caem 6–20 dB entre 50–200 Hz.
+    // Aplicamos ~60 % de correção — conservador o bastante para não "inventar" graves.
+    const PHONE_HEURISTIC_CORRECTION_DB = [
+      11, 10, 9, 7.5, 6, 4.5, 3, 1.5, 0.5, 0.0,  // 20–160 Hz
+       0,  0, 0,   0, 0,   0, 0,   0,   0,   0,  // 200–1600 Hz
+       0,  0, 0,   0, 0,   0, 0,   0,   0,   0, 0 // 2k–20k Hz
+    ];
+
     const state = {
-      gainsDB: new Array(31).fill(0), // Faders de -15dB a +15dB (0 = flat)
-      measuredRTA: new Array(31).fill(-60), // Nível medido em dB
+      gainsDB: new Array(31).fill(0),
+      measuredRTA: new Array(31).fill(-60),
       isAnalyzing: false,
       isBypassed: false,
       positions: [],
       noiseBands: null,
       micCalibration: null,
       micCalibrationName: null,
+      usePhoneHeuristic: false,
       positionSNR: null,
       correctedRTA: null,
       verifyReliable: null,
@@ -804,7 +391,7 @@
     };
 
     /* ==========================================================================
-       2. PROTOCOLO SOUNDCRAFT UI (EXTRAÍDO E NATIVO WEBSOCKET)
+       2. PROTOCOLO SOUNDCRAFT UI
        ========================================================================== */
     class SoundcraftMixer {
       constructor() {
@@ -948,21 +535,12 @@
         return new Promise((resolve, reject) => {
           let elapsed = 0;
           const timer = setInterval(() => {
-            if (!this.isConnected) {
-              clearInterval(timer);
-              reject(new Error('A mesa desconectou durante a confirmação.'));
-              return;
-            }
+            if (!this.isConnected) { clearInterval(timer); reject(new Error('A mesa desconectou durante a confirmação.')); return; }
             if (Number.isFinite(this.params[path]) && this.params[path] === expected) {
-              clearInterval(timer);
-              resolve(true);
-              return;
+              clearInterval(timer); resolve(true); return;
             }
             elapsed += 50;
-            if (elapsed >= timeoutMs) {
-              clearInterval(timer);
-              reject(new Error(`A mesa não confirmou ${path}=${expected} em ${timeoutMs} ms.`));
-            }
+            if (elapsed >= timeoutMs) { clearInterval(timer); reject(new Error(`A mesa não confirmou ${path}=${expected} em ${timeoutMs} ms.`)); }
           }, 50);
         });
       }
@@ -984,13 +562,8 @@
           log(`[Mixer] Não foi possível enviar ${path}: mesa desconectada.`, 'error');
           return false;
         }
-        try {
-          this.ws.send(`3:::SETD^${path}^${value}`);
-          return true;
-        } catch (e) {
-          log(`[Mixer] Falha ao enviar ${path}: ${e.message}`, 'error');
-          return false;
-        }
+        try { this.ws.send(`3:::SETD^${path}^${value}`); return true; }
+        catch (e) { log(`[Mixer] Falha ao enviar ${path}: ${e.message}`, 'error'); return false; }
       }
 
       dbToFader(gainDB) {
@@ -1062,10 +635,7 @@
       }
 
       undo() {
-        if (!state.undoGains) {
-          log('[Mixer] Não há aplicação anterior para desfazer.', 'error');
-          return;
-        }
+        if (!state.undoGains) { log('[Mixer] Não há aplicação anterior para desfazer.', 'error'); return; }
         if (!this.isConnected || !this.hasMasterEqSnapshot()) {
           log('[Mixer] Não é possível desfazer sem leitura atual completa do GEQ L/R e do bypass.', 'error');
           return;
@@ -1084,10 +654,7 @@
         updateMixerControls();
       }
 
-      resetFlat() {
-        const flat = new Array(31).fill(0);
-        return this.applyMasterGEQ(flat, flat);
-      }
+      resetFlat() { return this.applyMasterGEQ(new Array(31).fill(0)); }
 
       toggleBypass() {
         if (!this.isConnected || !Number.isFinite(this.params['m.eq.bypass'])) {
@@ -1105,14 +672,14 @@
     const mixer = new SoundcraftMixer();
 
     /* ==========================================================================
-       3. MOTOR DE ÁUDIO RTA (WEB AUDIO API)
+       3. MOTOR RTA
        ========================================================================== */
     class RTAEngine {
       constructor() {
         this.audioCtx = null;
         this.analyser = null;
         this.micStream = null;
-        this.fftSize = 32768; // ~1,5 Hz/bin: resolução suficiente para as bandas graves
+        this.fftSize = 32768;
         this.buffer = null;
         this.timeBuffer = null;
         this.bandBins = [];
@@ -1132,10 +699,7 @@
           const AudioContextClass = window.AudioContext || window.webkitAudioContext;
           this.audioCtx = new AudioContextClass();
         }
-
-        if (this.audioCtx.state === 'suspended') {
-          await this.audioCtx.resume();
-        }
+        if (this.audioCtx.state === 'suspended') await this.audioCtx.resume();
 
         if (!this.micStream) {
           const constraints = {
@@ -1151,26 +715,18 @@
           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             getMedia = () => navigator.mediaDevices.getUserMedia(constraints);
           } else {
-            const legacyGetMedia = navigator.getUserMedia ||
-                                   navigator.webkitGetUserMedia ||
-                                   navigator.mozGetUserMedia ||
-                                   navigator.msGetUserMedia;
-            if (legacyGetMedia) {
-              getMedia = () => new Promise((res, rej) => legacyGetMedia.call(navigator, constraints, res, rej));
-            }
+            const legacyGetMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                                   navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            if (legacyGetMedia) getMedia = () => new Promise((res, rej) => legacyGetMedia.call(navigator, constraints, res, rej));
           }
+          if (!getMedia) throw new Error('O navegador exige HTTPS ou localhost para liberar o microfone.');
 
-          if (!getMedia) {
-            throw new Error('O navegador exige HTTPS ou localhost para liberar o microfone. A URL segura deve ser fornecida pelo servidor que hospeda o aplicativo.');
-          }
-
-          // Captura com todos os filtros automáticos do celular DESATIVADOS
           this.micStream = await getMedia();
           const audioTrack = this.micStream.getAudioTracks()[0];
           if (!audioTrack) throw new Error('O dispositivo selecionado não forneceu uma faixa de áudio.');
           const st = audioTrack.getSettings ? audioTrack.getSettings() : {};
           if (st.echoCancellation || st.noiseSuppression || st.autoGainControl) {
-            log('[Microfone] O navegador manteve processamento automático (eco/ruído/AGC): a medição pode sair distorcida. Tente Chrome/Android ou um microfone externo.', 'error');
+            log('[Microfone] O navegador manteve processamento automático (eco/ruído/AGC): a medição pode sair distorcida.', 'error');
           }
           refreshInputs();
 
@@ -1186,7 +742,6 @@
         }
       }
 
-      // Pesos fracionários por bin: cada banda de 1/3 de oitava recebe exatamente a energia dentro de seus limites
       calcBandBins() {
         const bw = this.audioCtx.sampleRate / this.fftSize;
         const maxK = this.buffer.length - 1;
@@ -1206,13 +761,11 @@
         });
       }
 
-      // Lê os níveis gerais em tempo real (RMS e Pico para detecção de Clipping)
       getAudioLevels() {
         if (!this.analyser) return { rmsDB: -100, peakDB: -100, isClipping: false };
         const timeData = this.timeBuffer || new Float32Array(this.analyser.fftSize);
         this.analyser.getFloatTimeDomainData(timeData);
-        let sumSquare = 0;
-        let peak = 0;
+        let sumSquare = 0, peak = 0;
         for (let i = 0; i < timeData.length; i++) {
           const val = timeData[i];
           const abs = Math.abs(val);
@@ -1220,21 +773,19 @@
           sumSquare += val * val;
         }
         const rms = Math.sqrt(sumSquare / timeData.length);
-        const rmsDB = rms > 0 ? 20 * Math.log10(rms) : -100;
-        const peakDB = peak > 0 ? 20 * Math.log10(peak) : -100;
-        return { rmsDB, peakDB, isClipping: peak >= 0.98 };
+        return {
+          rmsDB: rms > 0 ? 20 * Math.log10(rms) : -100,
+          peakDB: peak > 0 ? 20 * Math.log10(peak) : -100,
+          isClipping: peak >= 0.98
+        };
       }
 
-      // Energia instantânea por banda (soma ponderada de potência)
       getInstantBands() {
         this.analyser.getFloatFrequencyData(this.buffer);
         const bands = new Float32Array(31);
         for (let i = 0; i < 31; i++) {
           const { k0, w, coveredBins, coverage } = this.bandBins[i];
-          if (coverage < 0.90 || coveredBins < 3) {
-            bands[i] = -100;
-            continue;
-          }
+          if (coverage < 0.90 || coveredBins < 3) { bands[i] = -100; continue; }
           let p = 0;
           for (let j = 0; j < w.length; j++) {
             const dbVal = this.buffer[k0 + j];
@@ -1245,104 +796,74 @@
         return bands;
       }
 
-      // Captura temporal; a média espacial é calculada entre as regiões depois.
       async startCapture(durationSeconds, onProgress) {
         await this.init();
-
         const samples = [];
-        const intervalMs = 750; // aproximadamente uma janela FFT por amostra em 44,1/48 kHz
+        const intervalMs = 750;
         const totalFrames = Math.round((durationSeconds * 1000) / intervalMs);
-        let frameCount = 0;
-        let clippingCount = 0;
-        let totalRmsPower = 0;
-
+        let frameCount = 0, clippingCount = 0, totalRmsPower = 0;
         const vuFill = document.getElementById('vuMeterFill');
         const vuText = document.getElementById('vuMeterText');
 
         return new Promise((resolve, reject) => {
           const timer = setInterval(() => {
             try {
-            const instant = this.getInstantBands();
-            const levels = this.getAudioLevels();
-            samples.push(instant);
-            frameCount++;
-            totalRmsPower += Math.pow(10, levels.rmsDB / 10);
-            if (levels.isClipping) clippingCount++;
+              const instant = this.getInstantBands();
+              const levels = this.getAudioLevels();
+              samples.push(instant);
+              frameCount++;
+              totalRmsPower += Math.pow(10, levels.rmsDB / 10);
+              if (levels.isClipping) clippingCount++;
 
-            // Atualiza VU Meter na tela
-            if (vuFill && vuText) {
-              const clampedRMS = Math.max(-60, Math.min(0, levels.rmsDB));
-              const pct = ((clampedRMS + 60) / 60) * 100;
-              vuFill.style.width = `${pct}%`;
-
-              if (levels.isClipping) {
-                vuFill.style.background = '#ff5252';
-                vuText.style.color = '#ff5252';
-                vuText.textContent = `🔴 CLIPPING (${levels.peakDB.toFixed(1)} dBFS)`;
-              } else if (levels.rmsDB > -15) {
-                vuFill.style.background = '#ffcc00';
-                vuText.style.color = '#ffcc00';
-                vuText.textContent = `🟡 Entrada alta (${levels.rmsDB.toFixed(1)} dBFS)`;
-              } else if (levels.rmsDB > -45) {
-                vuFill.style.background = '#00e676';
-                vuText.style.color = '#00e676';
-                vuText.textContent = `🟢 Sinal presente (${levels.rmsDB.toFixed(1)} dBFS)`;
-              } else {
-                vuFill.style.background = '#4a5568';
-                vuText.style.color = '#8e95a5';
-                vuText.textContent = `⚠️ Sinal baixo (${levels.rmsDB.toFixed(1)} dBFS)`;
-              }
-            }
-
-            // Atualiza visualização em tempo real
-            state.measuredRTA = instant;
-            renderVisualizer();
-
-            const progress = (frameCount / totalFrames);
-            const remaining = Math.max(0, durationSeconds - (frameCount * (intervalMs / 1000))).toFixed(1);
-            if (onProgress) onProgress(progress, remaining);
-
-            if (frameCount >= totalFrames) {
-              clearInterval(timer);
-
-              const avgRMS = totalRmsPower > 0 ? 10 * Math.log10(totalRmsPower / samples.length) : -100;
-              if (avgRMS < -50) {
-                log(`[Aviso Acústico] Nível médio de entrada muito baixo (${avgRMS.toFixed(1)} dBFS). Confira o sinal e o ganho de entrada.`, 'error');
-              }
-              if (clippingCount > 2) {
-                log(`[Aviso Acústico] O microfone atingiu saturação (Clipping) em ${clippingCount} momentos. Se puder, refaça abaixando um pouco o som da mesa.`, 'error');
-              }
-
-              // Média temporal robusta em potência; o corte das caudas reduz eventos isolados,
-              // mas não substitui um ambiente controlado e sinal de teste contínuo.
-              const averaged = new Float32Array(31);
-
-              for (let b = 0; b < 31; b++) {
-                const bandVals = samples.map(s => s[b]).sort((x, y) => x - y);
-                let startIdx = 0;
-                let endIdx = bandVals.length;
-
-                if (bandVals.length >= 20) {
-                  const trim = Math.floor(bandVals.length * TEMPORAL_TRIM_FRACTION);
-                  startIdx = trim;
-                  endIdx = bandVals.length - trim;
+              if (vuFill && vuText) {
+                const clampedRMS = Math.max(-60, Math.min(0, levels.rmsDB));
+                const pct = ((clampedRMS + 60) / 60) * 100;
+                vuFill.style.width = `${pct}%`;
+                if (levels.isClipping) {
+                  vuFill.style.background = '#ff5252'; vuText.style.color = '#ff5252';
+                  vuText.textContent = `🔴 CLIPPING (${levels.peakDB.toFixed(1)} dBFS)`;
+                } else if (levels.rmsDB > -15) {
+                  vuFill.style.background = '#ffcc00'; vuText.style.color = '#ffcc00';
+                  vuText.textContent = `🟡 Entrada alta (${levels.rmsDB.toFixed(1)} dBFS)`;
+                } else if (levels.rmsDB > -45) {
+                  vuFill.style.background = '#00e676'; vuText.style.color = '#00e676';
+                  vuText.textContent = `🟢 Sinal presente (${levels.rmsDB.toFixed(1)} dBFS)`;
+                } else {
+                  vuFill.style.background = '#4a5568'; vuText.style.color = '#8e95a5';
+                  vuText.textContent = `⚠️ Sinal baixo (${levels.rmsDB.toFixed(1)} dBFS)`;
                 }
-
-                let sumPower = 0;
-                let count = 0;
-                for (let s = startIdx; s < endIdx; s++) {
-                  sumPower += Math.pow(10, bandVals[s] / 10);
-                  count++;
-                }
-                averaged[b] = 10 * Math.log10(sumPower / count);
               }
 
-              resolve(averaged);
-            }
-            } catch (error) {
-              clearInterval(timer);
-              reject(error);
-            }
+              state.measuredRTA = instant;
+              renderVisualizer();
+
+              const progress = (frameCount / totalFrames);
+              const remaining = Math.max(0, durationSeconds - (frameCount * (intervalMs / 1000))).toFixed(1);
+              if (onProgress) onProgress(progress, remaining);
+
+              if (frameCount >= totalFrames) {
+                clearInterval(timer);
+                const avgRMS = totalRmsPower > 0 ? 10 * Math.log10(totalRmsPower / samples.length) : -100;
+                if (avgRMS < -50) log(`[Aviso] Nível médio muito baixo (${avgRMS.toFixed(1)} dBFS). Confira sinal e ganho.`, 'error');
+                if (clippingCount > 2) log(`[Aviso] Saturação em ${clippingCount} momentos. Refaça baixando o som.`, 'error');
+
+                const averaged = new Float32Array(31);
+                for (let b = 0; b < 31; b++) {
+                  const bandVals = samples.map(s => s[b]).sort((x, y) => x - y);
+                  let startIdx = 0, endIdx = bandVals.length;
+                  if (bandVals.length >= 20) {
+                    const trim = Math.floor(bandVals.length * TEMPORAL_TRIM_FRACTION);
+                    startIdx = trim; endIdx = bandVals.length - trim;
+                  }
+                  let sumPower = 0, count = 0;
+                  for (let s = startIdx; s < endIdx; s++) {
+                    sumPower += Math.pow(10, bandVals[s] / 10); count++;
+                  }
+                  averaged[b] = count ? 10 * Math.log10(sumPower / count) : -100;
+                }
+                resolve(averaged);
+              }
+            } catch (error) { clearInterval(timer); reject(error); }
           }, intervalMs);
         });
       }
@@ -1359,11 +880,11 @@
         sel.innerHTML = '<option value="">Entrada padrão do aparelho</option>' +
           devs.map((d, i) => `<option value="${d.deviceId}">${d.label || 'Microfone ' + (i + 1)}</option>`).join('');
         sel.value = prev;
-      } catch (e) { /* sem permissão ainda */ }
+      } catch (e) { /* sem permissão */ }
     }
 
     /* ==========================================================================
-       4. ALGORITMO CONSERVADOR DE MEDIÇÃO E SUGESTÃO DE EQ
+       4. CALIBRAÇÃO E ALGORITMO
        ========================================================================== */
     function parseMicCalibration(text) {
       const points = [];
@@ -1374,33 +895,24 @@
         if (!values || values.length < 2) continue;
         const hz = Number(values[0]);
         const correctionDB = Number(values[1]);
-        if (Number.isFinite(hz) && hz > 0 && Number.isFinite(correctionDB)) {
-          points.push({hz, correctionDB});
-        }
+        if (Number.isFinite(hz) && hz > 0 && Number.isFinite(correctionDB)) points.push({hz, correctionDB});
       }
       points.sort((a, b) => a.hz - b.hz);
       const unique = [];
       for (const point of points) {
-        if (unique.length && point.hz === unique[unique.length - 1].hz) {
-          throw new Error(`Frequência duplicada no arquivo: ${point.hz} Hz.`);
-        }
+        if (unique.length && point.hz === unique[unique.length - 1].hz) throw new Error(`Frequência duplicada: ${point.hz} Hz.`);
         unique.push(point);
       }
-      if (unique.length < 2) {
-        throw new Error('O arquivo precisa ter ao menos duas linhas numéricas: frequência (Hz) e correção (dB).');
-      }
+      if (unique.length < 2) throw new Error('Arquivo precisa de ao menos 2 linhas: frequência (Hz) e correção (dB).');
       return unique;
     }
 
-    // Interpolação em escala logarítmica de frequência. Correção positiva é somada à leitura.
     function interpolateMicCorrection(hz, curve) {
       if (!curve || hz < curve[0].hz || hz > curve[curve.length - 1].hz) return null;
-      let lo = 0;
-      let hi = curve.length - 1;
+      let lo = 0, hi = curve.length - 1;
       while (hi - lo > 1) {
         const mid = Math.floor((lo + hi) / 2);
-        if (curve[mid].hz <= hz) lo = mid;
-        else hi = mid;
+        if (curve[mid].hz <= hz) lo = mid; else hi = mid;
       }
       if (hz === curve[lo].hz) return curve[lo].correctionDB;
       if (hz === curve[hi].hz) return curve[hi].correctionDB;
@@ -1424,17 +936,13 @@
         const snrValues = positions.map(row => signalToNoiseDb(row[b], noiseBands[b]));
         const valid = snrValues.filter(value => Number.isFinite(value));
         const passing = valid.filter(value => value >= MIN_SNR_DB).length;
-        // A maioria das regiões precisa ter SNR suficiente nessa banda.
         result[b] = passing >= Math.floor(positions.length / 2) + 1;
       }
       return result;
     }
 
-    // Cada posição é normalizada de 125 Hz a 4 kHz antes da média de potência.
-    // Assim, uma posição capturada apenas mais alta não domina o resultado espacial.
     function normalizedPowerAverage(list) {
       if (!list || !list.length) return new Float32Array(31).fill(-100);
-      // A qualidade (SNR) é verificada nas medições brutas, antes de qualquer normalização.
       const rowQuality = list.map(row => row.map((value, band) =>
         !state.noiseBands || signalToNoiseDb(value, state.noiseBands[band]) >= MIN_SNR_DB
       ));
@@ -1450,26 +958,32 @@
 
       const out = new Float32Array(31);
       for (let b = 0; b < 31; b++) {
-        let power = 0;
-        let count = 0;
+        let power = 0, count = 0;
         for (let rowIndex = 0; rowIndex < normalized.length; rowIndex++) {
           const row = normalized[rowIndex];
           if (!row || !rowQuality[rowIndex][b] || !Number.isFinite(row[b]) || row[b] <= -99) continue;
-          power += Math.pow(10, row[b] / 10);
-          count++;
+          power += Math.pow(10, row[b] / 10); count++;
         }
         out[b] = count ? 10 * Math.log10(power / count) : -100;
       }
       return out;
     }
 
+    // ---------- CORAÇÃO DO FIX ----------
     function prepareMeasurement(measured, options = {}) {
       const curveType = document.getElementById('targetCurve').value;
       const target = TARGET_CURVES[curveType] || TARGET_CURVES.flat;
       const checkNoise = options.checkNoise !== false;
       const calibration = state.micCalibration;
-      const minHz = calibration ? calibration[0].hz : UNCALIBRATED_MIN_HZ;
+
+      // Faixa útil depende do que temos:
+      //  - Curva individual: usa os limites do arquivo
+      //  - Heurística de celular: 50 Hz a 8 kHz
+      //  - Nenhuma correção: 125 Hz a 8 kHz (seguro)
+      const minHz = calibration ? calibration[0].hz
+                  : (state.usePhoneHeuristic ? UNCALIBRATED_MIN_HZ_HEUR : UNCALIBRATED_MIN_HZ);
       const maxHz = calibration ? calibration[calibration.length - 1].hz : UNCALIBRATED_MAX_HZ;
+
       const corrected = new Array(31).fill(-100);
       const reliable = new Array(31).fill(false);
       const positionSNR = state.noiseBands && checkNoise && state.positions.length
@@ -1478,16 +992,27 @@
 
       for (let i = 0; i < 31; i++) {
         const hz = ISO_FREQUENCIES[i];
-        const correction = calibration ? interpolateMicCorrection(hz, calibration) : 0;
+
+        // Correção a aplicar:
+        let correction = 0;
+        if (calibration) {
+          const v = interpolateMicCorrection(hz, calibration);
+          correction = (v === null) ? NaN : v;
+        } else if (state.usePhoneHeuristic) {
+          correction = PHONE_HEURISTIC_CORRECTION_DB[i];
+        }
+
         const bins = rta.bandBins[i];
-        const validBand = hz >= minHz && hz <= maxHz && correction !== null &&
+        const validBand = hz >= minHz && hz <= maxHz && Number.isFinite(correction) &&
           bins && bins.coverage >= 0.90 && bins.coveredBins >= 3 &&
           Number.isFinite(measured[i]) && measured[i] > -95;
+
         if (!validBand) continue;
         corrected[i] = measured[i] + correction;
         reliable[i] = !positionSNR || positionSNR[i];
       }
 
+      // Ancoragem na região média 500 Hz–2 kHz (bandas 14–20)
       const anchorIndices = [];
       for (let i = 14; i <= 20; i++) if (reliable[i]) anchorIndices.push(i);
       if (anchorIndices.length < 4) {
@@ -1501,47 +1026,94 @@
       const err = corrected.map((value, i) => reliable[i]
         ? (target[i] - targetRef) - (value - measuredRef)
         : 0);
+
       state.correctedRTA = corrected;
       return {err, reliable, corrected, anchorValid: true};
     }
 
+    // ⬇⬇⬇ ALGORITMO REESCRITO ⬇⬇⬇
     function calculateAutoEQ(measuredBands) {
       state.verifyReliable = null;
-      const {err, reliable, anchorValid} = prepareMeasurement(measuredBands);
+      const { err, reliable, anchorValid } = prepareMeasurement(measuredBands);
       state.lastReliable = reliable;
       const gains = new Array(31).fill(0);
       if (!anchorValid) return gains;
 
-      // Regularização de três bandas em dB, usando apenas bandas confiáveis.
-      // O algoritmo é cut-only: RTA mono não consegue distinguir com segurança um nulo de uma deficiência real.
+      // PASSO 1 — cortes (peaks) e boosts (vales largos)
       for (let i = 0; i < 31; i++) {
-        if (!reliable[i] || err[i] >= -AUTO_EQ_DEADBAND_DB) continue;
-        let weighted = 0;
-        let weights = 0;
-        for (let j = Math.max(0, i - 1); j <= Math.min(30, i + 1); j++) {
-          if (!reliable[j]) continue;
-          const weight = j === i ? 2 : 1;
-          weighted += err[j] * weight;
-          weights += weight;
-        }
-        if (!weights) continue;
-        const smoothedError = weighted / weights;
-        if (smoothedError < -AUTO_EQ_DEADBAND_DB) {
-          gains[i] = Math.max(MAX_AUTO_CUT_DB, Math.min(0, smoothedError * 0.65));
+        if (!reliable[i]) continue;
+        const e = err[i];
+
+        if (e < -AUTO_EQ_DEADBAND_DB) {
+          // ---------- PICO: CORTE ----------
+          // "peakness": centro mais alto que a média dos vizinhos → pico estreito (corte cheio)
+          // centro parecido com vizinhos → elevação larga (corte parcial, mais suave)
+          let nbSum = 0, nbCount = 0;
+          if (i > 0  && reliable[i - 1]) { nbSum += err[i - 1]; nbCount++; }
+          if (i < 30 && reliable[i + 1]) { nbSum += err[i + 1]; nbCount++; }
+          const nbAvg = nbCount ? nbSum / nbCount : 0;
+          const peakness = e - nbAvg;     // negativo em picos reais
+
+          let correction;
+          if (peakness < -1.0) {
+            // Pico definido (ressonância/modo de sala) — corte integral
+            correction = e;
+          } else {
+            // Elevação larga — corte mais suave (evita "afinar" a curva inteira)
+            correction = e * 0.85;
+          }
+          gains[i] = Math.max(MAX_AUTO_CUT_DB, correction);
+
+        } else if (e > AUTO_EQ_DEADBAND_DB) {
+          // ---------- VALE: BOOST SÓ SE LARGO ----------
+          let isWide = true, checkCount = 0;
+          for (let k = -1; k <= 1; k += 2) {
+            const j = i + k;
+            if (j < 0 || j > 30 || !reliable[j]) { isWide = false; break; }
+            // Vizinho também precisa estar em vale (>= 50% do centro)
+            if (err[j] < e * 0.5) { isWide = false; break; }
+            checkCount++;
+          }
+          if (isWide && checkCount >= 2) {
+            // Boost controlado (nunca preencher nulls estreitos)
+            gains[i] = Math.min(MAX_AUTO_BOOST_DB, e * 0.5);
+          }
+          // caso contrário, deixa 0 (evita compensar cancelamentos acústicos)
         }
       }
-      return gains.map(gain => Math.round(gain * 10) / 10);
+
+      // PASSO 2 — suavização leve onde vizinhos têm mesmo sinal (evita serrilhado)
+      const smoothed = new Array(31).fill(0);
+      for (let i = 0; i < 31; i++) {
+        if (!reliable[i]) { smoothed[i] = gains[i]; continue; }
+        let sum = gains[i] * 2, w = 2;
+        for (let k = -1; k <= 1; k += 2) {
+          const j = i + k;
+          if (j < 0 || j > 30 || !reliable[j]) continue;
+          if (gains[j] * gains[i] >= 0) { sum += gains[j]; w++; }
+        }
+        smoothed[i] = sum / w;
+      }
+
+      // PASSO 3 — limitar boost total (proteção contra over-boost em celular)
+      const totalBoost = smoothed.reduce((s, g) => s + Math.max(0, g), 0);
+      if (totalBoost > MAX_TOTAL_BOOST_DB) {
+        const scale = MAX_TOTAL_BOOST_DB / totalBoost;
+        for (let i = 0; i < 31; i++) if (smoothed[i] > 0) smoothed[i] *= scale;
+      }
+
+      return smoothed.map(g => Math.round(g * 10) / 10);
     }
 
     /* ==========================================================================
-       5. INTERFACE DO USUÁRIO & GRÁFICOS (CANVAS + FADERS)
+       5. UI / VISUALIZER / FADERS
        ========================================================================== */
     const canvas = document.getElementById('rtaCanvas');
     const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.width  = rect.width  * window.devicePixelRatio;
       canvas.height = rect.height * window.devicePixelRatio;
       renderVisualizer();
     }
@@ -1549,96 +1121,96 @@
 
     function renderVisualizer() {
       if (!canvas.width) return;
-      const w = canvas.width;
-      const h = canvas.height;
+      const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-
-      // Fundo e Linhas de Grid
       ctx.fillStyle = '#0a0b0e';
       ctx.fillRect(0, 0, w, h);
-
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#1e222b';
 
       const padding = 20;
       const graphW = w - padding * 2;
       const graphH = h - padding * 2;
 
-      // Linhas Horizontais de dB (-15 a +15 dB)
+      // Grid
+      ctx.lineWidth = 1; ctx.strokeStyle = '#1e222b';
       const dBLabels = [12, 6, 0, -6, -12];
       ctx.fillStyle = '#4a5568';
       ctx.font = `${10 * window.devicePixelRatio}px monospace`;
-
       for (const db of dBLabels) {
-        // Y proporcional: +15dB = topo (padding), -15dB = base (padding + graphH)
         const y = padding + graphH * (1 - (db + 15) / 30);
-        ctx.beginPath();
-        ctx.moveTo(padding, y);
-        ctx.lineTo(w - padding, y);
-        ctx.stroke();
-
+        ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(w - padding, y); ctx.stroke();
         ctx.fillText(`${db > 0 ? '+' : ''}${db}dB`, 4, y + 3);
       }
-
-      // Linha central 0 dB destacada
       const zeroY = padding + graphH * 0.5;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.beginPath();
-      ctx.moveTo(padding, zeroY);
-      ctx.lineTo(w - padding, zeroY);
-      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.beginPath(); ctx.moveTo(padding, zeroY); ctx.lineTo(w - padding, zeroY); ctx.stroke();
 
       const stepX = graphW / 30;
 
-      // 1. Desenha Curva Alvo (Amarela tracejada)
+      // 1) Curva alvo (amarelo tracejado)
       const curveType = document.getElementById('targetCurve').value;
-      const targetCurve = TARGET_CURVES[curveType] || TARGET_CURVES.house;
-
+      const targetCurve = TARGET_CURVES[curveType] || TARGET_CURVES.flat;
       ctx.beginPath();
       ctx.setLineDash([4 * window.devicePixelRatio, 4 * window.devicePixelRatio]);
       ctx.strokeStyle = '#ffcc00';
       ctx.lineWidth = 2 * window.devicePixelRatio;
-
       for (let i = 0; i < 31; i++) {
         const x = padding + i * stepX;
         const y = padding + graphH * (1 - (targetCurve[i] + 15) / 30);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
-      ctx.setLineDash([]); // Restaura traço contínuo
+      ctx.setLineDash([]);
 
-      // 2. Desenha Espectro Medido RTA (Azul Ciano)
-      ctx.beginPath();
-      ctx.strokeStyle = '#00d2ff';
-      ctx.lineWidth = 2.5 * window.devicePixelRatio;
-
-      // Normaliza o espectro medido visualmente para a escala de -15 a +15 dB
+      // 2) Resposta medida (ciano)
       const plotData = state.correctedRTA || state.measuredRTA;
       const plotReliability = state.correctedRTA
         ? (state.verifyReliable || state.lastReliable)
         : null;
-      let midSum = 0;
-      let midCount = 0;
+      let midSum = 0, midCount = 0;
       for (let i = 14; i <= 20; i++) {
-        if ((!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95) { midSum += plotData[i]; midCount++; }
+        if ((!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95) {
+          midSum += plotData[i]; midCount++;
+        }
       }
       const ref = midCount ? midSum / midCount : 0;
 
-      let hasPreviousPoint = false;
+      ctx.beginPath();
+      ctx.strokeStyle = '#00d2ff';
+      ctx.lineWidth = 2.5 * window.devicePixelRatio;
+      let hasPoint = false;
       for (let i = 0; i < 31; i++) {
         const valid = (!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95;
-        if (!valid) { hasPreviousPoint = false; continue; }
+        if (!valid) { hasPoint = false; continue; }
         const x = padding + i * stepX;
         const relVal = Math.max(-15, Math.min(15, plotData[i] - ref));
         const y = padding + graphH * (1 - (relVal + 15) / 30);
-        if (!hasPreviousPoint) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-        hasPreviousPoint = true;
+        if (!hasPoint) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        hasPoint = true;
       }
       ctx.stroke();
 
-      // 3. Desenha Barras de Correção Aplicadas (Verde / Vermelho)
+      // 3) Resposta prevista pós-EQ (verde tracejado)
+      if (state.correctedRTA && state.gainsDB.some(g => Math.abs(g) > 0.05)) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#00e676';
+        ctx.lineWidth = 2 * window.devicePixelRatio;
+        ctx.setLineDash([3 * window.devicePixelRatio, 3 * window.devicePixelRatio]);
+        hasPoint = false;
+        for (let i = 0; i < 31; i++) {
+          const valid = (!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95;
+          if (!valid) { hasPoint = false; continue; }
+          const predicted = plotData[i] + state.gainsDB[i];
+          const x = padding + i * stepX;
+          const relVal = Math.max(-15, Math.min(15, predicted - ref));
+          const y = padding + graphH * (1 - (relVal + 15) / 30);
+          if (!hasPoint) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          hasPoint = true;
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // 4) Marcadores de ajuste aplicado (verde/vermelho)
       for (let i = 0; i < 31; i++) {
         const val = state.gainsDB[i];
         if (Math.abs(val) > 0.1) {
@@ -1652,17 +1224,13 @@
       }
     }
 
-    // Inicializa os 31 Faders virtuais do rack (somente visualização/leitura)
     function buildFadersUi() {
       const container = document.getElementById('fadersRack');
       container.innerHTML = '';
-
       for (let i = 0; i < 31; i++) {
-        const freq = ISO_FREQUENCIES[i];
         const col = document.createElement('div');
         col.className = 'fader-col';
         col.dataset.band = i;
-
         col.innerHTML = `
           <div class="fader-db" id="faderDb_${i}">0.0</div>
           <div class="fader-track" id="faderTrack_${i}">
@@ -1670,9 +1238,7 @@
             <div class="fader-bar" id="faderBar_${i}"></div>
             <div class="fader-thumb" id="faderThumb_${i}"></div>
           </div>
-          <div class="fader-freq">${formatFreq(freq)}</div>
-        `;
-
+          <div class="fader-freq">${formatFreq(ISO_FREQUENCIES[i])}</div>`;
         container.appendChild(col);
       }
       updateAllFadersUi();
@@ -1681,39 +1247,28 @@
     function updateFaderUi(i) {
       const db = state.gainsDB[i];
       const dbElem = document.getElementById(`faderDb_${i}`);
-      const bar = document.getElementById(`faderBar_${i}`);
-      const thumb = document.getElementById(`faderThumb_${i}`);
-
+      const bar    = document.getElementById(`faderBar_${i}`);
+      const thumb  = document.getElementById(`faderThumb_${i}`);
       if (!dbElem) return;
 
       dbElem.textContent = (db > 0 ? `+${db}` : `${db}`);
       dbElem.className = 'fader-db' + (db > 0.1 ? ' boost' : (db < -0.1 ? ' cut' : ''));
 
-      // Posição proporcional na track (160px de altura padrão)
-      // +15dB = 0%, 0dB = 50%, -15dB = 100%
-      const pct = (15 - db) / 30; // 0 a 1
-      thumb.style.top = `${pct * 100}%`;
-
+      thumb.style.top = `${((15 - db) / 30) * 100}%`;
       if (db > 0) {
         bar.className = 'fader-bar boost';
-        bar.style.top = 'auto';
-        bar.style.bottom = '50%';
+        bar.style.top = 'auto'; bar.style.bottom = '50%';
         bar.style.height = `${(db / 15) * 50}%`;
       } else if (db < 0) {
         bar.className = 'fader-bar cut';
-        bar.style.bottom = 'auto';
-        bar.style.top = '50%';
+        bar.style.bottom = 'auto'; bar.style.top = '50%';
         bar.style.height = `${(Math.abs(db) / 15) * 50}%`;
       } else {
         bar.style.height = '0%';
       }
     }
 
-    function updateAllFadersUi() {
-      for (let i = 0; i < 31; i++) {
-        updateFaderUi(i);
-      }
-    }
+    function updateAllFadersUi() { for (let i = 0; i < 31; i++) updateFaderUi(i); }
 
     function updateBypassUi() {
       const elem = document.getElementById('bypassState');
@@ -1725,14 +1280,14 @@
 
     function updateMixerControls() {
       const snapshotReady = mixer.isConnected && mixer.hasMasterEqSnapshot();
-      const apply = document.getElementById('btnApplyMixer');
-      const reset = document.getElementById('btnResetFlat');
-      const undo = document.getElementById('btnUndo');
+      const apply  = document.getElementById('btnApplyMixer');
+      const reset  = document.getElementById('btnResetFlat');
+      const undo   = document.getElementById('btnUndo');
       const bypass = document.getElementById('btnToggleBypass');
-      const enoughReliableBands = state.lastReliable && state.lastReliable.filter(Boolean).length >= 4;
-      if (apply) apply.disabled = !snapshotReady || !!mixer.pendingApply || state.positions.length === 0 || !enoughReliableBands;
-      if (reset) reset.disabled = !snapshotReady || !!mixer.pendingApply;
-      if (undo) undo.disabled = !snapshotReady || !state.undoGains;
+      const enoughReliable = state.lastReliable && state.lastReliable.filter(Boolean).length >= 4;
+      if (apply)  apply.disabled  = !snapshotReady || !!mixer.pendingApply || state.positions.length === 0 || !enoughReliable;
+      if (reset)  reset.disabled  = !snapshotReady || !!mixer.pendingApply;
+      if (undo)   undo.disabled   = !snapshotReady || !state.undoGains;
       if (bypass) bypass.disabled = !mixer.isConnected || !Number.isFinite(mixer.params['m.eq.bypass']);
     }
 
@@ -1774,8 +1329,8 @@
       const label = document.getElementById('statusText');
       badge.className = `status-badge ${status}`;
       label.textContent = text;
-      const connectButton = document.getElementById('btnConnect');
-      if (connectButton) connectButton.textContent = status === 'connected' || status === 'connecting' ? 'Desconectar' : 'Conectar';
+      const cb = document.getElementById('btnConnect');
+      if (cb) cb.textContent = (status === 'connected' || status === 'connecting') ? 'Desconectar' : 'Conectar';
     }
 
     function log(msg, type = 'normal') {
@@ -1789,75 +1344,56 @@
     }
 
     /* ==========================================================================
-       5.1. PWA: INSTALAÇÃO NO ANDROID E IOS
+       5.1. PWA
        ========================================================================== */
     let deferredInstallPrompt = null;
     const btnInstall = document.getElementById('btnInstall');
-    const isStandaloneMode =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true;
-    const isIOSDevice =
-      /iphone|ipad|ipod/i.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+                        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-    function showInstallButton() {
-      if (btnInstall && !isStandaloneMode) {
-        btnInstall.style.display = 'inline-flex';
-      }
-    }
+    function showInstallButton() { if (btnInstall && !isStandaloneMode) btnInstall.style.display = 'inline-flex'; }
 
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault();
       deferredInstallPrompt = event;
       showInstallButton();
     });
-
     window.addEventListener('appinstalled', () => {
       deferredInstallPrompt = null;
       if (btnInstall) btnInstall.style.display = 'none';
-      log('[PWA] Aplicativo instalado com sucesso!', 'success');
+      log('[PWA] Aplicativo instalado.', 'success');
     });
-
-    if (isIOSDevice && !isStandaloneMode) {
-      showInstallButton();
-    }
-
+    if (isIOSDevice && !isStandaloneMode) showInstallButton();
     if (btnInstall) {
       btnInstall.addEventListener('click', async () => {
         if (deferredInstallPrompt) {
           deferredInstallPrompt.prompt();
           const choice = await deferredInstallPrompt.userChoice;
-          log(`[PWA] Instalação ${choice.outcome === 'accepted' ? 'aceita' : 'cancelada'} pelo usuário.`, 'info');
+          log(`[PWA] Instalação ${choice.outcome === 'accepted' ? 'aceita' : 'cancelada'}.`, 'info');
           deferredInstallPrompt = null;
           btnInstall.style.display = 'none';
           return;
         }
-
         if (isIOSDevice) {
-          alert('Para instalar no iPhone/iPad:\n\n1. Toque em Compartilhar (ícone de quadrado com seta).\n2. Escolha "Adicionar à Tela de Início".\n3. Confirme em "Adicionar".');
+          alert('Para instalar no iPhone/iPad:\n\n1. Toque em Compartilhar.\n2. Escolha "Adicionar à Tela de Início".\n3. Confirme.');
         } else {
-          alert('Para instalar no Android:\n\n1. Abra o menu do Chrome (três pontos).\n2. Toque em "Instalar aplicativo" ou "Adicionar à tela inicial".\n3. Confirme em "Instalar".');
+          alert('Para instalar no Android:\n\n1. Abra o menu do Chrome (três pontos).\n2. Toque em "Instalar aplicativo".\n3. Confirme.');
         }
       });
     }
 
     /* ==========================================================================
-       6. EVENT LISTENERS & FLUXO DE EXECUÇÃO
+       6. EVENTOS
        ========================================================================== */
-    // Conexão com a mesa.
     document.getElementById('btnConnect').addEventListener('click', () => {
       const ip = document.getElementById('mixerIp').value.trim();
-      if (!ip) {
-        alert('Informe o IP da mesa Soundcraft.');
-        return;
-      }
+      if (!ip) { alert('Informe o IP da mesa Soundcraft.'); return; }
       if (mixer.isConnected || mixer.isConnecting) mixer.disconnect();
       else mixer.connect(ip);
     });
 
-    document.getElementById('targetCurve').addEventListener('change', () => {
-      recalculateFromPositions();
-    });
+    document.getElementById('targetCurve').addEventListener('change', () => recalculateFromPositions());
 
     const btnStartRta = document.getElementById('btnStartRta');
     const progressBox = document.getElementById('progressBox');
@@ -1879,15 +1415,22 @@
         document.getElementById('micCalibrationStatus').textContent =
           `${file.name} · ${parsed.length} pontos · ${parsed[0].hz} Hz a ${parsed[parsed.length - 1].hz} Hz`;
         clearAnalysisData();
-        log(`[Microfone] Curva individual carregada: ${file.name}. Medições anteriores descartadas.`, 'success');
+        log(`[Microfone] Curva carregada: ${file.name}. Medições anteriores descartadas.`, 'success');
       } catch (err) {
         state.micCalibration = null;
         state.micCalibrationName = null;
         event.target.value = '';
         document.getElementById('micCalibrationStatus').textContent = 'Arquivo inválido; sem correção individual.';
         clearAnalysisData();
-        alert(`Não foi possível carregar a curva do microfone: ${err.message}`);
+        alert(`Erro ao carregar a curva: ${err.message}`);
       }
+    });
+
+    // Toggle da heurística de celular → recalcula se já há posições
+    document.getElementById('phoneHeuristic').addEventListener('change', (e) => {
+      state.usePhoneHeuristic = e.target.checked;
+      log(`[Microfone] Compensação heurística de celular ${state.usePhoneHeuristic ? 'ATIVADA' : 'desativada'}.`, 'info');
+      if (state.positions.length) recalculateFromPositions();
     });
 
     btnStartRta.addEventListener('click', async () => {
@@ -1901,8 +1444,7 @@
       const connected = mixer.isConnected;
       const bypassValue = mixer.params['m.eq.bypass'];
       const autoBypass = connected && needsBaseline;
-      let wasBypassed = state.isBypassed;
-      let changedBypass = false;
+      let wasBypassed = state.isBypassed, changedBypass = false;
 
       btnStartRta.disabled = true;
       progressBox.style.display = 'block';
@@ -1914,15 +1456,12 @@
             throw new Error('A mesa está conectada, mas o estado atual do bypass ainda não foi lido. Aguarde a leitura do GEQ e tente novamente.');
           }
           wasBypassed = bypassValue === 1;
-          if (!wasBypassed) {
-            changedBypass = true;
-            await mixer.setBypassAndWait(true, 2500);
-          }
-          log('[RTA] Estado de bypass confirmado pela mesa antes da medição de referência.', 'info');
+          if (!wasBypassed) { changedBypass = true; await mixer.setBypassAndWait(true, 2500); }
+          log('[RTA] Bypass confirmado pela mesa antes da medição de referência.', 'info');
         } else if (mode === 'measure') {
           log('[RTA] Sem conexão com a mesa: confirme manualmente que o GEQ Master está flat ou em bypass.', 'info');
         }
-        if (mode === 'noise') log('[RTA] Meça o ruído ambiente com o ruído rosa desligado.', 'info');
+        if (mode === 'noise')  log('[RTA] Meça o ruído ambiente com o ruído rosa desligado.', 'info');
         if (mode === 'verify') log('[RTA] Verificação pós-EQ: mantenha o ruído rosa ligado e o EQ ativo.', 'info');
 
         const averaged = await rta.startCapture(duration, (pct, remaining) => {
@@ -1933,30 +1472,30 @@
 
         if (mode === 'noise') {
           state.noiseBands = averaged;
-          log('[RTA] Ruído de fundo armazenado. O SNR será calculado em potência na medição de referência.', 'success');
+          log('[RTA] Ruído de fundo armazenado.', 'success');
           if (state.positions.length) recalculateFromPositions();
         } else if (mode === 'measure') {
           state.positions.push(averaged);
           recalculateFromPositions();
-          const skipped = state.lastReliable ? state.lastReliable.filter(value => !value).length : 31;
+          const skipped = state.lastReliable ? state.lastReliable.filter(v => !v).length : 31;
           const reliableCount = state.lastReliable ? state.lastReliable.filter(Boolean).length : 0;
           if (reliableCount < 4) {
-            log(`[Auto-EQ] Sem sugestão: apenas ${reliableCount} bandas confiáveis. Confira sinal, ruído de fundo, curva do microfone e amostras.`, 'error');
+            log(`[Auto-EQ] Sem sugestão: apenas ${reliableCount} bandas confiáveis. Confira sinal, ruído, curva e amostras.`, 'error');
           } else {
-            log(`[Auto-EQ] ${state.positions.length} região(ões) na média de potência normalizada. ${skipped} banda(s) excluída(s) por faixa, cobertura ou SNR.`, 'success');
+            log(`[Auto-EQ] ${state.positions.length} região(ões) na média. ${skipped} banda(s) excluída(s).`, 'success');
           }
-          if (state.positions.length < 3) log('[Orientação] Faça pelo menos 3 capturas em regiões distintas para representar a plateia.', 'info');
+          if (state.positions.length < 3) log('[Orientação] Faça pelo menos 3 capturas em regiões distintas.', 'info');
         } else {
           state.measuredRTA = averaged;
-          const {err, reliable, anchorValid} = prepareMeasurement(averaged, {checkNoise: false});
+          const { err, reliable, anchorValid } = prepareMeasurement(averaged, { checkNoise: false });
           state.verifyReliable = reliable;
           const validErrors = err.filter((_, i) => reliable[i]);
           if (anchorValid && validErrors.length) {
-            const rmsError = Math.sqrt(validErrors.reduce((sum, value) => sum + value * value, 0) / validErrors.length);
-            const worst = err.reduce((best, value, i) => reliable[i] && Math.abs(value) > Math.abs(err[best]) ? i : best, validErrors.length ? err.findIndex((_, i) => reliable[i]) : 0);
-            log(`[Verificação] Desvio RMS ${rmsError.toFixed(1)} dB; maior desvio ${err[worst].toFixed(1)} dB em ${formatFreq(ISO_FREQUENCIES[worst])} Hz (${validErrors.length} bandas).`, 'info');
+            const rmsError = Math.sqrt(validErrors.reduce((s, v) => s + v * v, 0) / validErrors.length);
+            const worst = validErrors.length ? err.findIndex((v, i) => reliable[i] && Math.abs(v) === Math.max(...validErrors.map(x => Math.abs(x)))) : 0;
+            log(`[Verificação] Desvio RMS ${rmsError.toFixed(1)} dB; maior desvio ${(err[worst] || 0).toFixed(1)} dB em ${formatFreq(ISO_FREQUENCIES[worst])} Hz.`, 'info');
           } else {
-            log('[Verificação] Não há bandas suficientes para uma comparação válida com a curva-alvo.', 'error');
+            log('[Verificação] Bandas insuficientes para comparação válida.', 'error');
           }
         }
         updatePosUi();
@@ -1971,7 +1510,7 @@
             await mixer.setBypassAndWait(wasBypassed, 2500);
             log('[RTA] Estado anterior do bypass restaurado e confirmado.', 'info');
           } catch (restoreError) {
-            log(`[RTA] ATENÇÃO: não foi possível confirmar a restauração do bypass: ${restoreError.message}. Confira a mesa antes de continuar.`, 'error');
+            log(`[RTA] ATENÇÃO: não foi possível confirmar restauração do bypass: ${restoreError.message}.`, 'error');
           }
         }
         state.isAnalyzing = false;
@@ -1982,7 +1521,7 @@
 
     document.getElementById('btnClearPos').addEventListener('click', () => {
       clearAnalysisData();
-      log('[RTA] Posições e ruído de fundo descartados; sugestões zeradas.', 'info');
+      log('[RTA] Posições e ruído de fundo descartados.', 'info');
     });
 
     document.getElementById('btnUndo').addEventListener('click', () => mixer.undo());
@@ -1990,17 +1529,22 @@
     document.getElementById('audioInput').addEventListener('change', () => {
       rta.reset();
       clearAnalysisData();
-      log('[Microfone] Entrada alterada. Medições e ruído de fundo descartados.', 'info');
+      log('[Microfone] Entrada alterada. Medições descartadas.', 'info');
     });
 
     document.getElementById('btnApplyMixer').addEventListener('click', () => {
       const warnings = [];
-      if (!state.micCalibration) warnings.push('O microfone está sem curva individual de correção; a faixa de 125 Hz a 8 kHz é apenas provisória.');
-      if (!state.noiseBands) warnings.push('O ruído de fundo não foi medido; não foi possível aplicar o critério de SNR por banda.');
-      if (state.positions.length < 3) warnings.push(`Foram feitas somente ${state.positions.length} região(ões); 3 a 5 são preferíveis para representar a plateia.`);
-      warnings.push('A curva é uma sugestão inicial: os filtros reais do GEQ e a interação entre caixas e ambiente não são simulados. Verifique novamente após aplicar.');
-      warnings.push('RTA de canal único não mede fase, coerência, delay ou função de transferência; não substitui alinhamento de sistema.');
-      if (!confirm(`Antes de aplicar no Master L/R:\n\n${warnings.join('\n\n')}\n\nA aplicação substituirá as 31 bandas dos dois lados. Deseja continuar?`)) return;
+      if (!state.micCalibration && !state.usePhoneHeuristic) {
+        warnings.push('O microfone está sem curva individual e sem compensação heurística. A faixa útil é limitada a 125 Hz–8 kHz.');
+      }
+      if (!state.micCalibration && state.usePhoneHeuristic) {
+        warnings.push('Compensação heurística ativa: útil, mas é uma estimativa. Prefira uma curva individual para precisão de graves.');
+      }
+      if (!state.noiseBands) warnings.push('Ruído de fundo não foi medido; critério de SNR por banda não foi aplicado.');
+      if (state.positions.length < 3) warnings.push(`Somente ${state.positions.length} região(ões); 3 a 5 são preferíveis.`);
+      warnings.push('A curva é uma sugestão inicial. Os filtros reais do GEQ e a interação caixa–ambiente não são simulados. Verifique após aplicar.');
+      warnings.push('RTA de canal único não mede fase, coerência ou delay; não substitui alinhamento de sistema.');
+      if (!confirm(`Antes de aplicar no Master L/R:\n\n${warnings.join('\n\n')}\n\nIsso substituirá as 31 bandas dos dois lados. Continuar?`)) return;
       mixer.applyMasterGEQ(state.gainsDB, state.gainsDB);
       updateMixerControls();
     });
@@ -2013,45 +1557,38 @@
     document.getElementById('btnToggleBypass').addEventListener('click', () => mixer.toggleBypass());
 
     /* ==========================================================================
-       7. INICIALIZAÇÃO E SERVICE WORKER OFFLINE
+       7. INIT
        ========================================================================== */
     window.addEventListener('DOMContentLoaded', () => {
       buildFadersUi();
       resizeCanvas();
       refreshInputs();
 
-      // Verifica contexto seguro para microfone
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (!window.isSecureContext && !isLocalhost) {
         const warn = document.getElementById('securityWarning');
         if (warn) warn.style.display = 'block';
-        log('[Segurança] O navegador exige contexto seguro (HTTPS ou localhost) para liberar o microfone.', 'error');
+        log('[Segurança] Contexto inseguro: microfone bloqueado. Use HTTPS ou localhost.', 'error');
       }
       updateBypassUi();
       updateMixerControls();
 
-      // Registro do Service Worker com detecção automática de nova versão
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
-          // Força checagem de nova versão sempre que abrir
           reg.update();
-
           reg.onupdatefound = () => {
             const installingWorker = reg.installing;
             installingWorker.onstatechange = () => {
               if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                log('[Sistema] Nova versão do app instalada com sucesso! Atualizando...', 'success');
+                log('[Sistema] Nova versão instalada! Atualizando...', 'success');
                 setTimeout(() => window.location.reload(), 600);
               }
             };
           };
-
-          log('[PWA] Service Worker registrado; verificação automática de versão ativa.', 'success');
+          log('[PWA] Service Worker registrado.', 'success');
         }).catch((err) => console.log('SW registration error:', err));
       }
     });
-
-    // A atualização do PWA é verificada automaticamente pelo Service Worker.
   </script>
 </body>
 </html>
