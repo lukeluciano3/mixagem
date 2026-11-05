@@ -430,7 +430,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: ns-resize;
+      cursor: default;
+      pointer-events: none;
     }
 
     .fader-center-line {
@@ -724,7 +725,7 @@
     <div class="card">
       <div class="card-title">
         <div><span class="step-number">3</span>Equalizador Gráfico Master (31 Bandas)</div>
-        <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Valores calculados em dB (Arraste para ajuste manual se desejar)</span>
+        <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Valores calculados em dB pelo Auto-RTA (Ajuste automático exclusivo)</span>
       </div>
 
       <div id="fadersRack" class="faders-container">
@@ -1387,7 +1388,7 @@
       }
     }
 
-    // Inicializa os 31 Faders virtuais do rack
+    // Inicializa os 31 Faders virtuais do rack (somente visualização/leitura)
     function buildFadersUi() {
       const container = document.getElementById('fadersRack');
       container.innerHTML = '';
@@ -1408,55 +1409,9 @@
           <div class="fader-freq">${formatFreq(freq)}</div>
         `;
 
-        // Interação de Arraste (Touch e Mouse)
-        const track = col.querySelector('.fader-track');
-        attachFaderDrag(track, i);
-
         container.appendChild(col);
       }
       updateAllFadersUi();
-    }
-
-    function attachFaderDrag(track, index) {
-      function updateFromPointer(e) {
-        const rect = track.getBoundingClientRect();
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        const offsetY = clientY - rect.top;
-        const pct = Math.max(0, Math.min(1, offsetY / rect.height));
-
-        // Topo = +15 dB, Fundo = -15 dB
-        let db = 15 - (pct * 30);
-        db = Math.round(db * 2) / 2; // Passos de 0.5 dB
-
-        state.gainsDB[index] = db;
-        updateFaderUi(index);
-        renderVisualizer();
-      }
-
-      function onStart(e) {
-        e.preventDefault();
-        updateFromPointer(e);
-
-        function onMove(ev) {
-          ev.preventDefault();
-          updateFromPointer(ev);
-        }
-
-        function onEnd() {
-          window.removeEventListener('mousemove', onMove);
-          window.removeEventListener('mouseup', onEnd);
-          window.removeEventListener('touchmove', onMove);
-          window.removeEventListener('touchend', onEnd);
-        }
-
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onEnd);
-        window.addEventListener('touchmove', onMove, { passive: false });
-        window.addEventListener('touchend', onEnd);
-      }
-
-      track.addEventListener('mousedown', onStart);
-      track.addEventListener('touchstart', onStart, { passive: false });
     }
 
     function updateFaderUi(i) {
