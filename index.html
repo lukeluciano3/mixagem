@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#121316">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Soundcraft Ui — Auto-RTA & Master EQ</title>
   <link rel="manifest" href="manifest.json">
   <style>
@@ -564,6 +567,9 @@
       </div>
       <input type="text" id="mixerIp" class="ip-input" value="10.10.1.1" placeholder="IP da Mesa">
       <button id="btnConnect" class="btn btn-primary">Conectar</button>
+      <button onclick="forceAppUpdate()" class="btn" title="Limpar cache e carregar versão mais recente do GitHub" style="padding: 7px 10px; font-size: 11px;">
+        🔄 Atualizar
+      </button>
     </div>
   </header>
 
@@ -1614,13 +1620,44 @@
         log('[Segurança] Acesse via HTTPS (porta 8443) para liberar o microfone no celular.', 'error');
       }
 
-      // Registro do Service Worker para suporte Offline PWA
+      // Registro do Service Worker com detecção automática de nova versão
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-          .then(() => log('[PWA] Cache Offline ativado via Service Worker.', 'info'))
-          .catch((err) => console.log('SW registration error:', err));
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          // Força checagem de nova versão sempre que abrir
+          reg.update();
+
+          reg.onupdatefound = () => {
+            const installingWorker = reg.installing;
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                log('[Sistema] Nova versão do app instalada com sucesso! Atualizando...', 'success');
+                setTimeout(() => window.location.reload(), 600);
+              }
+            };
+          };
+
+          log('[PWA] Cache Offline pronto (Estratégia Network-First ativa).', 'info');
+        }).catch((err) => console.log('SW registration error:', err));
       }
     });
+
+    // Função de limpeza total de cache manual (Escape Hatch)
+    window.forceAppUpdate = async function() {
+      if (confirm('Deseja limpar todo o cache local e recarregar a versão mais recente do GitHub?')) {
+        log('[Sistema] Limpando caches locais...', 'info');
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (let r of regs) {
+            await r.unregister();
+          }
+        }
+        window.location.reload(true);
+      }
+    };
   </script>
 </body>
 </html>
