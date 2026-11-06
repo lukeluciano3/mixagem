@@ -189,14 +189,15 @@
   <div id="securityWarning" style="display: none; background: #3b2204; border-bottom: 1px solid #ff9900; padding: 12px 18px; color: #ffcc66; font-size: 13px;">
     <strong>Microfone indisponível neste endereço.</strong>
     <p style="margin-top: 4px; color: #ffdf99; line-height: 1.4;">
-      O navegador exige HTTPS ou localhost para liberar o microfone.
+      O navegador exige HTTPS ou localhost para liberar o microfone. Em páginas HTTPS, a conexão local ws:// com a mesa também pode ser bloqueada pelo navegador.
     </p>
   </div>
   <div id="mixedContentTip" style="display: none; background: #152233; border-bottom: 1px solid #00d2ff; padding: 10px 18px; color: #bdeaff; font-size: 12px;">
-    A conexão WebSocket com a mesa falhou. Verifique o IP e as restrições de conteúdo misto do navegador.
+    A conexão WebSocket com a mesa falhou. Verifique o IP, a mesma rede local e as restrições de conteúdo misto do navegador.
   </div>
 
   <main>
+    <!-- ETAPA 1 -->
     <div class="card">
       <div class="card-title">
         <div><span class="step-number">1</span>Referência e microfone</div>
@@ -206,7 +207,7 @@
           <label for="targetCurve">Curva de referência</label>
           <select id="targetCurve" class="form-select">
             <option value="flat" selected>Resposta Flat (referência neutra)</option>
-            <option value="house">Curva de Sonorização (Warmth)</option>
+            <option value="house">House (warmth em graves + rolloff em agudos)</option>
           </select>
         </div>
         <div class="form-group">
@@ -224,7 +225,7 @@
         <div class="form-group">
           <label for="micCalibrationFile">Correção individual do microfone</label>
           <input id="micCalibrationFile" class="form-select" type="file" accept=".txt,.crv,.csv,text/plain" />
-          <small id="micCalibrationStatus" style="color:var(--text-muted);font-size:11px;line-height:1.35;">Sem arquivo: medição estimada, sem compensação individual.</small>
+          <small id="micCalibrationStatus" style="color:var(--text-muted);font-size:11px;line-height:1.35;">Use a Curva de Correção (a somar à leitura), não a Resposta Bruta do Mic.</small>
         </div>
       </div>
 
@@ -233,13 +234,14 @@
         <label for="phoneHeuristic">Compensação heurística de microfone de celular <span style="color:var(--primary);">(recomendado se não houver curva individual)</span></label>
       </div>
       <p style="margin-top:8px;color:var(--text-muted);font-size:11px;line-height:1.45;">
-        Aplica correção parcial (≈ 60 %) do rolloff típico de MEMS de celular abaixo de 160 Hz. Extende a faixa útil até ~50 Hz.
+        Aplica correção parcial (≈ 60 %) do rolloff típico de MEMS de celular abaixo de 160 Hz. Extende a faixa útil até ~50 Hz, mantendo o algoritmo conservador acima disso. <strong>Não substitui uma curva individual:</strong> use-a sempre que possível.
       </p>
       <div style="margin-top:10px;padding:10px 12px;border:1px solid var(--border-color);border-radius:6px;color:var(--text-muted);font-size:11px;line-height:1.45;">
-        <strong>Correção automática:</strong> cortes de até <strong>−12 dB</strong>; boosts de até <strong>+4 dB</strong> em vales largos; limite de boost em janelas de 1 oitava; zona morta de <strong>1,0 dB</strong>.
+        <strong>Correção automática:</strong> cortes de até <strong>−12 dB</strong> em picos; boosts de até <strong>+4 dB</strong> apenas em vales largos (≥ 3 bandas); limite global de <strong>+8 dB</strong>. Zona morta de <strong>1,0 dB</strong>.
       </div>
     </div>
 
+    <!-- ETAPA 2 -->
     <div class="card">
       <div class="card-title">
         <div><span class="step-number">2</span>Captura RTA em Tempo Real (Microfone)</div>
@@ -249,7 +251,7 @@
       <div class="action-container">
         <div class="action-info">
           <strong>Reproduza ruído rosa pelo sistema</strong>
-          <span>Use ruído rosa contínuo. Faça as medições com o EQ do Master em bypass.</span>
+          <span>Use ruído rosa contínuo, sem música ou fala. Faça as medições de referência com o EQ do Master em bypass.</span>
         </div>
         <button id="btnStartRta" class="btn btn-action">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
@@ -276,7 +278,7 @@
       </div>
 
       <div style="background: rgba(0, 210, 255, 0.07); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 12px; color: #bdeaff; line-height:1.45;">
-        <strong>Média espacial:</strong> faça 3 a 5 capturas em regiões distintas da plateia. Em cada captura, mova o microfone lentamente.
+        <strong>Média espacial:</strong> faça 3 a 5 capturas em regiões distintas da plateia, à altura dos ouvidos. Em cada captura, mova o microfone lentamente e de forma contínua.
       </div>
 
       <div id="progressBox" class="progress-box">
@@ -290,11 +292,12 @@
       <div class="legend">
         <div class="legend-item"><div class="legend-color" style="background: #00d2ff;"></div><span>Resposta medida</span></div>
         <div class="legend-item"><div class="legend-color" style="background: #ffcc00; border-top: 1px dashed #ffcc00;"></div><span>Curva de referência</span></div>
-        <div class="legend-item"><div class="legend-color" style="background: #00e676; border-top: 1px dashed #00e676;"></div><span>Resposta real prevista pós‑EQ</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #00e676; border-top: 1px dashed #00e676;"></div><span>Resposta prevista pós‑EQ</span></div>
         <div class="legend-item"><div class="legend-color" style="background: #ff5252;"></div><span>Ajuste aplicado</span></div>
       </div>
     </div>
 
+    <!-- ETAPA 3 -->
     <div class="card">
       <div class="card-title">
         <div><span class="step-number">3</span>Sugestões para o GEQ Master (31 bandas)</div>
@@ -314,9 +317,6 @@
           APLICAR CORREÇÕES NO MASTER L/R
         </button>
       </div>
-      <p style="margin-top:12px;font-size:11px;color:var(--text-muted);line-height:1.45;">
-        <strong>Nota profissional:</strong> Este software faz ajuste de magnitude via RTA (Single-Channel FFT). Ele não corrige fase, tempo de chegada, coerência de subgraves ou alinhamento L/R. Para uma calibração completa de PA, utilize softwares de Transfer Function (ex: Smaart) com interface de áudio e loopback.
-      </p>
     </div>
 
     <details class="diagnostics">
@@ -328,21 +328,20 @@
   </main>
 
   <script>
-    const ISO_FREQUENCIES = [
-      20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160,
-      200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
-      2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000
-    ];
+    /* ==========================================================================
+       1. CONSTANTES E CONFIGURAÇÕES
+       ========================================================================== */
+    const ISO_FREQUENCIES = [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000];
 
     function formatFreq(hz) { return hz >= 1000 ? (hz / 1000) + 'k' : hz.toString(); }
 
-    // Curva de Sonorização: Perfil com subgraves reforçados e rolloff suave (Referência Dolby-like)
+    // Curva House ajustada: +3.5dB em 63Hz/80Hz para um "warmth" real de PA.
     const TARGET_CURVES = {
       flat: new Array(31).fill(0),
       house: [
-         2.0,  2.0,  1.8,  1.5,  1.2,  1.0,  0.8,  0.5,  0.2,  0.0,
+         1.5,  2.0,  2.8,  3.2,  3.5,  3.5,  3.0,  2.0,  1.0,  0.0,
          0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
-        -0.2, -0.4, -0.7, -1.0, -1.4, -1.8, -2.2, -2.7, -3.2, -3.8, -4.5
+         0.0, -0.1, -0.2, -0.3, -0.5, -0.7, -0.9, -1.2, -1.5, -1.8, -2.2
       ]
     };
 
@@ -352,7 +351,7 @@
     const MIN_SNR_DB                = 10;
     const MAX_AUTO_CUT_DB           = -12;
     const MAX_AUTO_BOOST_DB         =  4;
-    const MAX_WINDOW_BOOST_DB       =  6;   // Ganho máximo acumulado em janelas de 1 oitava
+    const MAX_TOTAL_BOOST_DB        =  8;
     const AUTO_EQ_DEADBAND_DB       =  1.0;
     const TEMPORAL_TRIM_FRACTION    =  0.10;
 
@@ -379,6 +378,9 @@
       lastReliable: null
     };
 
+    /* ==========================================================================
+       2. PROTOCOLO SOUNDCRAFT UI
+       ========================================================================== */
     class SoundcraftMixer {
       constructor() {
         this.ws = null;
@@ -398,10 +400,12 @@
         this.isConnecting = true;
 
         let ws;
-        try { ws = new WebSocket(`ws://${this.ip}`); this.ws = ws; }
-        catch (e) {
+        try {
+          ws = new WebSocket(`ws://${this.ip}`);
+          this.ws = ws;
+        } catch (e) {
           this.isConnecting = false;
-          log(`[Mixer] Erro WebSocket: ${e.message}`, 'error');
+          log(`[Mixer] Não foi possível abrir o WebSocket: ${e.message}`, 'error');
           updateStatus('disconnected', 'Desconectado');
           updateMixerControls();
           return;
@@ -413,7 +417,7 @@
           this.isConnecting = false;
           this.params = {};
           updateStatus('connected', 'Conectado; lendo GEQ...');
-          log(`[Mixer] Conectado a ${this.ip}.`, 'info');
+          log(`[Mixer] WebSocket aberto em ${this.ip}. Aguardando leitura do GEQ L/R.`, 'info');
           this.aliveTimer = setInterval(() => {
             if (this.ws === ws && ws.readyState === WebSocket.OPEN) {
               try { ws.send('3:::ALIVE'); } catch (e) {}
@@ -422,7 +426,7 @@
           updateMixerControls();
           setTimeout(() => {
             if (this.ws === ws && this.isConnected && !this.hasMasterEqSnapshot()) {
-              log('[Mixer] Leitura incompleta do GEQ Master. Aplicação bloqueada.', 'error');
+              log('[Mixer] Leitura incompleta do GEQ Master (31 bandas L/R). Aplicação bloqueada por segurança.', 'error');
               updateStatus('connected', 'Conectado; GEQ não confirmado');
             }
           }, 4000);
@@ -454,7 +458,10 @@
           this.isConnected = false;
           clearInterval(this.aliveTimer);
           log(`[Mixer] Falha de comunicação com ${this.ip}.`, 'error');
-          if (window.location.protocol === 'https:') document.getElementById('mixedContentTip').style.display = 'block';
+          if (window.location.protocol === 'https:') {
+            const tip = document.getElementById('mixedContentTip');
+            if (tip) tip.style.display = 'block';
+          }
           updateStatus('disconnected', 'Falha de conexão');
           updateMixerControls();
         };
@@ -478,7 +485,10 @@
         this.clearPendingApply();
         const oldSocket = this.ws;
         this.ws = null;
-        if (oldSocket) { oldSocket.onclose = null; try { oldSocket.close(); } catch (_) {} }
+        if (oldSocket) {
+          oldSocket.onclose = null;
+          try { oldSocket.close(); } catch (_) {}
+        }
         updateStatus('disconnected', 'Desconectado');
         updateMixerControls();
       }
@@ -491,7 +501,8 @@
       hasMasterEqSnapshot() {
         if (!Number.isFinite(this.params['m.eq.bypass'])) return false;
         for (let i = 0; i < 31; i++) {
-          if (!Number.isFinite(this.params[`m.eq.peak.l.${i}`]) || !Number.isFinite(this.params[`m.eq.peak.r.${i}`])) return false;
+          if (!Number.isFinite(this.params[`m.eq.peak.l.${i}`]) ||
+              !Number.isFinite(this.params[`m.eq.peak.r.${i}`])) return false;
         }
         return true;
       }
@@ -507,15 +518,17 @@
       }
 
       waitForParam(path, expected, timeoutMs = 2000) {
-        if (!this.isConnected) return Promise.reject(new Error('Mesa desconectada.'));
+        if (!this.isConnected) return Promise.reject(new Error('A mesa desconectou antes de confirmar o parâmetro.'));
         if (Number.isFinite(this.params[path]) && this.params[path] === expected) return Promise.resolve(true);
         return new Promise((resolve, reject) => {
           let elapsed = 0;
           const timer = setInterval(() => {
-            if (!this.isConnected) { clearInterval(timer); reject(new Error('Desconectou.')); return; }
-            if (Number.isFinite(this.params[path]) && this.params[path] === expected) { clearInterval(timer); resolve(true); return; }
+            if (!this.isConnected) { clearInterval(timer); reject(new Error('A mesa desconectou durante a confirmação.')); return; }
+            if (Number.isFinite(this.params[path]) && this.params[path] === expected) {
+              clearInterval(timer); resolve(true); return;
+            }
             elapsed += 50;
-            if (elapsed >= timeoutMs) { clearInterval(timer); reject(new Error(`Timeout: ${path}=${expected}.`)); }
+            if (elapsed >= timeoutMs) { clearInterval(timer); reject(new Error(`A mesa não confirmou ${path}=${expected} em ${timeoutMs} ms.`)); }
           }, 50);
         });
       }
@@ -524,7 +537,7 @@
         const value = enabled ? 1 : 0;
         if (!this.isConnected) throw new Error('Mesa desconectada.');
         if (this.params['m.eq.bypass'] !== value) {
-          if (!this.sendSetd('m.eq.bypass', value)) throw new Error('Erro ao enviar bypass.');
+          if (!this.sendSetd('m.eq.bypass', value)) throw new Error('Não foi possível enviar o comando de bypass.');
           await this.waitForParam('m.eq.bypass', value, timeoutMs);
         }
         state.isBypassed = value === 1;
@@ -534,11 +547,11 @@
 
       sendSetd(path, value) {
         if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
-          log(`[Mixer] Falha ao enviar ${path}: desconectado.`, 'error');
+          log(`[Mixer] Não foi possível enviar ${path}: mesa desconectada.`, 'error');
           return false;
         }
         try { this.ws.send(`3:::SETD^${path}^${value}`); return true; }
-        catch (e) { log(`[Mixer] Falha: ${e.message}`, 'error'); return false; }
+        catch (e) { log(`[Mixer] Falha ao enviar ${path}: ${e.message}`, 'error'); return false; }
       }
 
       dbToFader(gainDB) {
@@ -548,17 +561,19 @@
 
       applyMasterGEQ(leftGains, rightGains = leftGains, options = {}) {
         if (this.pendingApply && options.recordUndo !== false) {
-          log('[Mixer] Aguarde aplicação atual.', 'error');
+          log('[Mixer] Aguarde a confirmação da aplicação atual ou use Desfazer.', 'error');
           return false;
         }
         if (options.recordUndo === false) this.clearPendingApply();
         if (!this.isConnected || !this.hasMasterEqSnapshot()) {
-          log('[Mixer] Aplicação bloqueada: sem conexão ou snapshot.', 'error');
+          log('[Mixer] Aplicação bloqueada: conexão ou leitura completa do GEQ indisponível.', 'error');
           alert('A mesa precisa estar conectada e os 31 valores de GEQ de L e R precisam ter sido lidos.');
           return false;
         }
-        if (!Array.isArray(leftGains) || !Array.isArray(rightGains) || leftGains.length !== 31 || rightGains.length !== 31 || [...leftGains, ...rightGains].some(v => !Number.isFinite(v))) {
-          log('[Mixer] Curva inválida.', 'error');
+        if (!Array.isArray(leftGains) || !Array.isArray(rightGains) ||
+            leftGains.length !== 31 || rightGains.length !== 31 ||
+            [...leftGains, ...rightGains].some(v => !Number.isFinite(v))) {
+          log('[Mixer] Curva inválida: são necessários 31 ganhos finitos para cada lado.', 'error');
           return false;
         }
 
@@ -579,13 +594,15 @@
         updateBypassUi();
         updateMixerControls();
 
-        if (!sent) { log('[Mixer] Falha no envio.', 'error'); return false; }
-        
+        if (!sent) {
+          log('[Mixer] Houve falha durante o envio. Confira o estado da mesa.', 'error');
+          return false;
+        }
         this.clearPendingApply();
         this.pendingApply = { expected, timer: setTimeout(() => {
           if (!this.pendingApply) return;
           this.pendingApply = null;
-          log('[Mixer] Comandos enviados, mas sem confirmação total.', 'error');
+          log('[Mixer] Comandos enviados, mas a mesa não confirmou todas as 62 bandas.', 'error');
           updateMixerControls();
         }, 5000) };
         this.checkPendingApply();
@@ -601,37 +618,50 @@
         );
         if (confirmed) {
           this.clearPendingApply();
-          log('[Mixer] Mesa confirmou os valores enviados.', 'success');
+          log('[Mixer] A mesa confirmou os valores enviados.', 'success');
         }
       }
 
       undo() {
-        if (!state.undoGains) { log('[Mixer] Nada para desfazer.', 'error'); return; }
-        if (!this.isConnected || !this.hasMasterEqSnapshot()) { log('[Mixer] Sem leitura atual.', 'error'); return; }
+        if (!state.undoGains) { log('[Mixer] Não há aplicação anterior para desfazer.', 'error'); return; }
+        if (!this.isConnected || !this.hasMasterEqSnapshot()) {
+          log('[Mixer] Não é possível desfazer sem leitura atual.', 'error');
+          return;
+        }
         const snapshot = state.undoGains;
         state.undoGains = null;
         state.gainsDB = snapshot.left.slice();
         updateAllFadersUi();
         renderVisualizer();
         this.applyMasterGEQ(snapshot.left, snapshot.right, {recordUndo: false});
-        if (snapshot.bypass) { this.sendSetd('m.eq.bypass', 1); state.isBypassed = true; updateBypassUi(); }
+        if (snapshot.bypass) {
+          this.sendSetd('m.eq.bypass', 1);
+          state.isBypassed = true;
+          updateBypassUi();
+        }
         updateMixerControls();
       }
 
       resetFlat() { return this.applyMasterGEQ(new Array(31).fill(0)); }
 
       toggleBypass() {
-        if (!this.isConnected || !Number.isFinite(this.params['m.eq.bypass'])) { log('[Mixer] Bypass indisponível.', 'error'); return; }
+        if (!this.isConnected || !Number.isFinite(this.params['m.eq.bypass'])) {
+          log('[Mixer] Estado do bypass ainda não foi lido.', 'error');
+          return;
+        }
         const nextBypass = this.params['m.eq.bypass'] === 1 ? 0 : 1;
         if (!this.sendSetd('m.eq.bypass', nextBypass)) return;
         state.isBypassed = nextBypass === 1;
         updateBypassUi();
-        log(`[Mixer] Bypass ${state.isBypassed ? 'ATIVADO' : 'DESATIVADO'}.`, 'info');
+        log(`[Mixer] Bypass do Master ${state.isBypassed ? 'ATIVADO' : 'DESATIVADO'}.`, 'info');
       }
     }
 
     const mixer = new SoundcraftMixer();
 
+    /* ==========================================================================
+       3. MOTOR RTA
+       ========================================================================== */
     class RTAEngine {
       constructor() {
         this.audioCtx = null;
@@ -645,7 +675,11 @@
 
       reset() {
         if (this.micStream) this.micStream.getTracks().forEach(t => t.stop());
-        this.micStream = null; this.analyser = null; this.buffer = null; this.timeBuffer = null; this.bandBins = [];
+        this.micStream = null;
+        this.analyser = null;
+        this.buffer = null;
+        this.timeBuffer = null;
+        this.bandBins = [];
       }
 
       async init() {
@@ -657,23 +691,31 @@
 
         if (!this.micStream) {
           const constraints = {
-            audio: Object.assign({ echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-            (document.getElementById('audioInput') && document.getElementById('audioInput').value) ? { deviceId: { exact: document.getElementById('audioInput').value } } : {})
+            audio: Object.assign({
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false
+            }, (document.getElementById('audioInput') && document.getElementById('audioInput').value)
+              ? { deviceId: { exact: document.getElementById('audioInput').value } } : {})
           };
+
           let getMedia = null;
           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             getMedia = () => navigator.mediaDevices.getUserMedia(constraints);
           } else {
-            const legacy = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-            if (legacy) getMedia = () => new Promise((res, rej) => legacy.call(navigator, constraints, res, rej));
+            const legacyGetMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                                   navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            if (legacyGetMedia) getMedia = () => new Promise((res, rej) => legacyGetMedia.call(navigator, constraints, res, rej));
           }
-          if (!getMedia) throw new Error('HTTPS ou localhost necessário para o microfone.');
+          if (!getMedia) throw new Error('O navegador exige HTTPS ou localhost para liberar o microfone.');
 
           this.micStream = await getMedia();
           const audioTrack = this.micStream.getAudioTracks()[0];
-          if (!audioTrack) throw new Error('Sem faixa de áudio.');
+          if (!audioTrack) throw new Error('O dispositivo selecionado não forneceu uma faixa de áudio.');
           const st = audioTrack.getSettings ? audioTrack.getSettings() : {};
-          if (st.echoCancellation || st.noiseSuppression || st.autoGainControl) log('[Microfone] Processamento automático ativo.', 'error');
+          if (st.echoCancellation || st.noiseSuppression || st.autoGainControl) {
+            log('[Microfone] O navegador manteve processamento automático (eco/ruído/AGC): a medição pode sair distorcida.', 'error');
+          }
           refreshInputs();
 
           const source = this.audioCtx.createMediaStreamSource(this.micStream);
@@ -700,7 +742,10 @@
             const ov = Math.min((k + 0.5) * bw, fHigh) - Math.max((k - 0.5) * bw, fLow);
             w.push(Math.max(0, ov) / bw);
           }
-          return { k0, w, coveredBins: w.filter(weight => weight > 0).length, coverage: w.reduce((sum, weight) => sum + weight * bw, 0) / (fHigh - fLow) };
+          const coveredBins = w.filter(weight => weight > 0).length;
+          const coveredWidth = w.reduce((sum, weight) => sum + weight * bw, 0);
+          const coverage = coveredWidth / (fHigh - fLow);
+          return { k0, w, coveredBins, coverage };
         });
       }
 
@@ -710,11 +755,17 @@
         this.analyser.getFloatTimeDomainData(timeData);
         let sumSquare = 0, peak = 0;
         for (let i = 0; i < timeData.length; i++) {
-          const val = timeData[i], abs = Math.abs(val);
+          const val = timeData[i];
+          const abs = Math.abs(val);
           if (abs > peak) peak = abs;
           sumSquare += val * val;
         }
-        return { rmsDB: Math.sqrt(sumSquare / timeData.length) > 0 ? 20 * Math.log10(Math.sqrt(sumSquare / timeData.length)) : -100, peakDB: peak > 0 ? 20 * Math.log10(peak) : -100, isClipping: peak >= 0.98 };
+        const rms = Math.sqrt(sumSquare / timeData.length);
+        return {
+          rmsDB: rms > 0 ? 20 * Math.log10(rms) : -100,
+          peakDB: peak > 0 ? 20 * Math.log10(peak) : -100,
+          isClipping: peak >= 0.98
+        };
       }
 
       getInstantBands() {
@@ -735,46 +786,67 @@
 
       async startCapture(durationSeconds, onProgress) {
         await this.init();
-        const samples = [], intervalMs = 750, totalFrames = Math.round((durationSeconds * 1000) / intervalMs);
+        const samples = [];
+        const intervalMs = 750;
+        const totalFrames = Math.round((durationSeconds * 1000) / intervalMs);
         let frameCount = 0, clippingCount = 0, totalRmsPower = 0;
-        const vuFill = document.getElementById('vuMeterFill'), vuText = document.getElementById('vuMeterText');
+        const vuFill = document.getElementById('vuMeterFill');
+        const vuText = document.getElementById('vuMeterText');
 
         return new Promise((resolve, reject) => {
           const timer = setInterval(() => {
             try {
               const instant = this.getInstantBands();
               const levels = this.getAudioLevels();
-              samples.push(instant); frameCount++; totalRmsPower += Math.pow(10, levels.rmsDB / 10);
+              samples.push(instant);
+              frameCount++;
+              totalRmsPower += Math.pow(10, levels.rmsDB / 10);
               if (levels.isClipping) clippingCount++;
 
               if (vuFill && vuText) {
                 const clampedRMS = Math.max(-60, Math.min(0, levels.rmsDB));
-                vuFill.style.width = `${((clampedRMS + 60) / 60) * 100}%`;
-                if (levels.isClipping) { vuFill.style.background = '#ff5252'; vuText.style.color = '#ff5252'; vuText.textContent = `🔴 CLIPPING`; }
-                else if (levels.rmsDB > -15) { vuFill.style.background = '#ffcc00'; vuText.style.color = '#ffcc00'; vuText.textContent = `🟡 Alta (${levels.rmsDB.toFixed(1)})`; }
-                else if (levels.rmsDB > -45) { vuFill.style.background = '#00e676'; vuText.style.color = '#00e676'; vuText.textContent = `🟢 Sinal (${levels.rmsDB.toFixed(1)})`; }
-                else { vuFill.style.background = '#4a5568'; vuText.style.color = '#8e95a5'; vuText.textContent = `⚠️ Baixo (${levels.rmsDB.toFixed(1)})`; }
+                const pct = ((clampedRMS + 60) / 60) * 100;
+                vuFill.style.width = `${pct}%`;
+                if (levels.isClipping) {
+                  vuFill.style.background = '#ff5252'; vuText.style.color = '#ff5252';
+                  vuText.textContent = `🔴 CLIPPING (${levels.peakDB.toFixed(1)} dBFS)`;
+                } else if (levels.rmsDB > -15) {
+                  vuFill.style.background = '#ffcc00'; vuText.style.color = '#ffcc00';
+                  vuText.textContent = `🟡 Entrada alta (${levels.rmsDB.toFixed(1)} dBFS)`;
+                } else if (levels.rmsDB > -45) {
+                  vuFill.style.background = '#00e676'; vuText.style.color = '#00e676';
+                  vuText.textContent = `🟢 Sinal presente (${levels.rmsDB.toFixed(1)} dBFS)`;
+                } else {
+                  vuFill.style.background = '#4a5568'; vuText.style.color = '#8e95a5';
+                  vuText.textContent = `⚠️ Sinal baixo (${levels.rmsDB.toFixed(1)} dBFS)`;
+                }
               }
 
               state.measuredRTA = instant;
               renderVisualizer();
 
-              const progress = (frameCount / totalFrames), remaining = Math.max(0, durationSeconds - (frameCount * (intervalMs / 1000))).toFixed(1);
+              const progress = (frameCount / totalFrames);
+              const remaining = Math.max(0, durationSeconds - (frameCount * (intervalMs / 1000))).toFixed(1);
               if (onProgress) onProgress(progress, remaining);
 
               if (frameCount >= totalFrames) {
                 clearInterval(timer);
                 const avgRMS = totalRmsPower > 0 ? 10 * Math.log10(totalRmsPower / samples.length) : -100;
-                if (avgRMS < -50) log(`[Aviso] Nível muito baixo (${avgRMS.toFixed(1)} dBFS).`, 'error');
-                if (clippingCount > 2) log(`[Aviso] Saturação detetada.`, 'error');
+                if (avgRMS < -50) log(`[Aviso] Nível médio muito baixo (${avgRMS.toFixed(1)} dBFS).`, 'error');
+                if (clippingCount > 2) log(`[Aviso] Saturação em ${clippingCount} momentos. Refaça baixando o som.`, 'error');
 
                 const averaged = new Float32Array(31);
                 for (let b = 0; b < 31; b++) {
                   const bandVals = samples.map(s => s[b]).sort((x, y) => x - y);
                   let startIdx = 0, endIdx = bandVals.length;
-                  if (bandVals.length >= 20) { const trim = Math.floor(bandVals.length * TEMPORAL_TRIM_FRACTION); startIdx = trim; endIdx = bandVals.length - trim; }
+                  if (bandVals.length >= 20) {
+                    const trim = Math.floor(bandVals.length * TEMPORAL_TRIM_FRACTION);
+                    startIdx = trim; endIdx = bandVals.length - trim;
+                  }
                   let sumPower = 0, count = 0;
-                  for (let s = startIdx; s < endIdx; s++) { sumPower += Math.pow(10, bandVals[s] / 10); count++; }
+                  for (let s = startIdx; s < endIdx; s++) {
+                    sumPower += Math.pow(10, bandVals[s] / 10); count++;
+                  }
                   averaged[b] = count ? 10 * Math.log10(sumPower / count) : -100;
                 }
                 resolve(averaged);
@@ -793,11 +865,15 @@
       try {
         const prev = sel.value;
         const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput');
-        sel.innerHTML = '<option value="">Entrada padrão</option>' + devs.map((d, i) => `<option value="${d.deviceId}">${d.label || 'Microfone ' + (i + 1)}</option>`).join('');
+        sel.innerHTML = '<option value="">Entrada padrão do aparelho</option>' +
+          devs.map((d, i) => `<option value="${d.deviceId}">${d.label || 'Microfone ' + (i + 1)}</option>`).join('');
         sel.value = prev;
       } catch (e) {}
     }
 
+    /* ==========================================================================
+       4. CALIBRAÇÃO E ALGORITMO
+       ========================================================================== */
     function parseMicCalibration(text) {
       const points = [];
       for (const rawLine of text.split(/\r?\n/)) {
@@ -805,7 +881,8 @@
         if (!line || /^[;*#]/.test(line)) continue;
         const values = line.match(/[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/g);
         if (!values || values.length < 2) continue;
-        const hz = Number(values[0]), correctionDB = Number(values[1]);
+        const hz = Number(values[0]);
+        const correctionDB = Number(values[1]);
         if (Number.isFinite(hz) && hz > 0 && Number.isFinite(correctionDB)) points.push({hz, correctionDB});
       }
       points.sort((a, b) => a.hz - b.hz);
@@ -814,14 +891,17 @@
         if (unique.length && point.hz === unique[unique.length - 1].hz) throw new Error(`Frequência duplicada: ${point.hz} Hz.`);
         unique.push(point);
       }
-      if (unique.length < 2) throw new Error('Arquivo inválido.');
+      if (unique.length < 2) throw new Error('Arquivo precisa de ao menos 2 linhas numéricas.');
       return unique;
     }
 
     function interpolateMicCorrection(hz, curve) {
       if (!curve || hz < curve[0].hz || hz > curve[curve.length - 1].hz) return null;
       let lo = 0, hi = curve.length - 1;
-      while (hi - lo > 1) { const mid = Math.floor((lo + hi) / 2); if (curve[mid].hz <= hz) lo = mid; else hi = mid; }
+      while (hi - lo > 1) {
+        const mid = Math.floor((lo + hi) / 2);
+        if (curve[mid].hz <= hz) lo = mid; else hi = mid;
+      }
       if (hz === curve[lo].hz) return curve[lo].correctionDB;
       if (hz === curve[hi].hz) return curve[hi].correctionDB;
       const t = (Math.log(hz) - Math.log(curve[lo].hz)) / (Math.log(curve[hi].hz) - Math.log(curve[lo].hz));
@@ -830,9 +910,11 @@
 
     function signalToNoiseDb(totalDB, noiseDB) {
       if (!Number.isFinite(totalDB) || !Number.isFinite(noiseDB)) return -Infinity;
-      const totalPower = Math.pow(10, totalDB / 10), noisePower = Math.pow(10, noiseDB / 10);
+      const totalPower = Math.pow(10, totalDB / 10);
+      const noisePower = Math.pow(10, noiseDB / 10);
       const signalPower = totalPower - noisePower;
-      return (signalPower <= 0 || noisePower <= 0) ? -Infinity : 10 * Math.log10(signalPower / noisePower);
+      if (signalPower <= 0 || noisePower <= 0) return -Infinity;
+      return 10 * Math.log10(signalPower / noisePower);
     }
 
     function computePositionSNR(positions, noiseBands) {
@@ -841,17 +923,22 @@
       for (let b = 0; b < 31; b++) {
         const snrValues = positions.map(row => signalToNoiseDb(row[b], noiseBands[b]));
         const valid = snrValues.filter(value => Number.isFinite(value));
-        result[b] = valid.filter(value => value >= MIN_SNR_DB).length >= Math.floor(positions.length / 2) + 1;
+        const passing = valid.filter(value => value >= MIN_SNR_DB).length;
+        result[b] = passing >= Math.floor(positions.length / 2) + 1;
       }
       return result;
     }
 
     function normalizedPowerAverage(list) {
       if (!list || !list.length) return new Float32Array(31).fill(-100);
-      const rowQuality = list.map(row => row.map((value, band) => !state.noiseBands || signalToNoiseDb(value, state.noiseBands[band]) >= MIN_SNR_DB));
+      const rowQuality = list.map(row => row.map((value, band) =>
+        !state.noiseBands || signalToNoiseDb(value, state.noiseBands[band]) >= MIN_SNR_DB
+      ));
       const normalized = list.map((row, rowIndex) => {
         const refValues = [];
-        for (let i = 8; i <= 23; i++) { if (rowQuality[rowIndex][i] && Number.isFinite(row[i]) && row[i] > -95) refValues.push(row[i]); }
+        for (let i = 8; i <= 23; i++) {
+          if (rowQuality[rowIndex][i] && Number.isFinite(row[i]) && row[i] > -95) refValues.push(row[i]);
+        }
         if (refValues.length < 8) return null;
         const level = refValues.reduce((sum, value) => sum + value, 0) / refValues.length;
         return Array.from(row, value => Number.isFinite(value) && value > -95 ? value - level : -100);
@@ -871,12 +958,19 @@
     }
 
     function prepareMeasurement(measured, options = {}) {
-      const target = TARGET_CURVES[document.getElementById('targetCurve').value] || TARGET_CURVES.flat;
-      const checkNoise = options.checkNoise !== false, calibration = state.micCalibration;
-      const minHz = calibration ? calibration[0].hz : (state.usePhoneHeuristic ? UNCALIBRATED_MIN_HZ_HEUR : UNCALIBRATED_MIN_HZ);
+      const curveType = document.getElementById('targetCurve').value;
+      const target = TARGET_CURVES[curveType] || TARGET_CURVES.flat;
+      const checkNoise = options.checkNoise !== false;
+      const calibration = state.micCalibration;
+      const minHz = calibration ? calibration[0].hz
+                  : (state.usePhoneHeuristic ? UNCALIBRATED_MIN_HZ_HEUR : UNCALIBRATED_MIN_HZ);
       const maxHz = calibration ? calibration[calibration.length - 1].hz : UNCALIBRATED_MAX_HZ;
-      const corrected = new Array(31).fill(-100), reliable = new Array(31).fill(false);
-      const positionSNR = state.noiseBands && checkNoise && state.positions.length ? (state.positionSNR || computePositionSNR(state.positions, state.noiseBands)) : null;
+
+      const corrected = new Array(31).fill(-100);
+      const reliable = new Array(31).fill(false);
+      const positionSNR = state.noiseBands && checkNoise && state.positions.length
+        ? (state.positionSNR || computePositionSNR(state.positions, state.noiseBands))
+        : null;
 
       for (let i = 0; i < 31; i++) {
         const hz = ISO_FREQUENCIES[i];
@@ -884,10 +978,16 @@
         if (calibration) {
           const v = interpolateMicCorrection(hz, calibration);
           correction = (v === null) ? NaN : v;
-        } else if (state.usePhoneHeuristic) correction = PHONE_HEURISTIC_CORRECTION_DB[i];
+        } else if (state.usePhoneHeuristic) {
+          correction = PHONE_HEURISTIC_CORRECTION_DB[i];
+        }
 
         const bins = rta.bandBins[i];
-        if (hz < minHz || hz > maxHz || !Number.isFinite(correction) || !bins || bins.coverage < 0.90 || bins.coveredBins < 3 || !Number.isFinite(measured[i]) || measured[i] <= -95) continue;
+        const validBand = hz >= minHz && hz <= maxHz && Number.isFinite(correction) &&
+          bins && bins.coverage >= 0.90 && bins.coveredBins >= 3 &&
+          Number.isFinite(measured[i]) && measured[i] > -95;
+
+        if (!validBand) continue;
         corrected[i] = measured[i] + correction;
         reliable[i] = !positionSNR || positionSNR[i];
       }
@@ -902,7 +1002,10 @@
 
       const measuredRef = anchorIndices.reduce((sum, i) => sum + corrected[i], 0) / anchorIndices.length;
       const targetRef = anchorIndices.reduce((sum, i) => sum + target[i], 0) / anchorIndices.length;
-      const err = corrected.map((value, i) => reliable[i] ? (target[i] - targetRef) - (value - measuredRef) : 0);
+      const err = corrected.map((value, i) => reliable[i]
+        ? (target[i] - targetRef) - (value - measuredRef)
+        : 0);
+
       state.correctedRTA = corrected;
       return {err, reliable, corrected, anchorValid: true};
     }
@@ -917,20 +1020,33 @@
       for (let i = 0; i < 31; i++) {
         if (!reliable[i]) continue;
         const e = err[i];
+
         if (e < -AUTO_EQ_DEADBAND_DB) {
           let nbSum = 0, nbCount = 0;
-          if (i > 0 && reliable[i - 1]) { nbSum += err[i - 1]; nbCount++; }
+          if (i > 0  && reliable[i - 1]) { nbSum += err[i - 1]; nbCount++; }
           if (i < 30 && reliable[i + 1]) { nbSum += err[i + 1]; nbCount++; }
           const nbAvg = nbCount ? nbSum / nbCount : 0;
-          gains[i] = Math.max(MAX_AUTO_CUT_DB, (e - nbAvg < -1.0) ? e : e * 0.85);
+          const peakness = e - nbAvg;
+
+          let correction;
+          if (peakness < -1.0) {
+            correction = e;
+          } else {
+            correction = e * 0.85;
+          }
+          gains[i] = Math.max(MAX_AUTO_CUT_DB, correction);
+
         } else if (e > AUTO_EQ_DEADBAND_DB) {
           let isWide = true, checkCount = 0;
           for (let k = -1; k <= 1; k += 2) {
             const j = i + k;
-            if (j < 0 || j > 30 || !reliable[j] || err[j] < e * 0.5) { isWide = false; break; }
+            if (j < 0 || j > 30 || !reliable[j]) { isWide = false; break; }
+            if (err[j] < e * 0.5) { isWide = false; break; }
             checkCount++;
           }
-          if (isWide && checkCount >= 2) gains[i] = Math.min(MAX_AUTO_BOOST_DB, e * 0.5);
+          if (isWide && checkCount >= 2) {
+            gains[i] = Math.min(MAX_AUTO_BOOST_DB, e * 0.5);
+          }
         }
       }
 
@@ -940,49 +1056,34 @@
         let sum = gains[i] * 2, w = 2;
         for (let k = -1; k <= 1; k += 2) {
           const j = i + k;
-          if (j >= 0 && j <= 30 && reliable[j] && gains[j] * gains[i] >= 0) { sum += gains[j]; w++; }
+          if (j < 0 || j > 30 || !reliable[j]) continue;
+          // FIX DO BUG: Ignora vizinhos que estão em 0 para não diluir cortes cirúrgicos
+          if (gains[j] !== 0 && Math.sign(gains[j]) === Math.sign(gains[i])) {
+            sum += gains[j];
+            w++;
+          }
         }
         smoothed[i] = sum / w;
       }
 
-      // CORREÇÃO 6.4: Limite de boost acumulado por janela de 1 oitava (em vez de soma global)
-      let maxWindowBoost = 0;
-      for (let i = 0; i <= 27; i++) {
-        let windowSum = 0;
-        for (let j = i; j < i + 4; j++) windowSum += Math.max(0, smoothed[j]);
-        if (windowSum > maxWindowBoost) maxWindowBoost = windowSum;
-      }
-      if (maxWindowBoost > MAX_WINDOW_BOOST_DB) {
-        const scale = MAX_WINDOW_BOOST_DB / maxWindowBoost;
+      const totalBoost = smoothed.reduce((s, g) => s + Math.max(0, g), 0);
+      if (totalBoost > MAX_TOTAL_BOOST_DB) {
+        const scale = MAX_TOTAL_BOOST_DB / totalBoost;
         for (let i = 0; i < 31; i++) if (smoothed[i] > 0) smoothed[i] *= scale;
       }
 
       return smoothed.map(g => Math.round(g * 10) / 10);
     }
 
-    // CORREÇÃO 7.1: Simulação de Filtro GEQ para traçar a curva prevista real
-    function simulateGEQResponse(gains) {
-      const response = new Array(31).fill(0);
-      const factor = 0.0802; // Q ~ 4.318 para 1/3 de oitava (ln(2) / (2 * Q))
-      for (let i = 0; i < 31; i++) {
-        if (Math.abs(gains[i]) < 0.1) continue;
-        const fc = ISO_FREQUENCIES[i];
-        for (let j = 0; j < 31; j++) {
-          const f = ISO_FREQUENCIES[j];
-          const x = Math.log(f / fc) / factor;
-          const weight = Math.exp(-0.5 * x * x);
-          response[j] += gains[i] * weight;
-        }
-      }
-      return response;
-    }
-
+    /* ==========================================================================
+       5. UI / VISUALIZER / FADERS
+       ========================================================================== */
     const canvas = document.getElementById('rtaCanvas');
     const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.width  = rect.width  * window.devicePixelRatio;
       canvas.height = rect.height * window.devicePixelRatio;
       renderVisualizer();
     }
@@ -990,67 +1091,116 @@
 
     function renderVisualizer() {
       if (!canvas.width) return;
-      const w = canvas.width, h = canvas.height, padding = 20, graphW = w - padding * 2, graphH = h - padding * 2, stepX = graphW / 30;
+      const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = '#0a0b0e'; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#0a0b0e';
+      ctx.fillRect(0, 0, w, h);
+
+      const padding = 20;
+      const graphW = w - padding * 2;
+      const graphH = h - padding * 2;
 
       ctx.lineWidth = 1; ctx.strokeStyle = '#1e222b';
       const dBLabels = [12, 6, 0, -6, -12];
-      ctx.fillStyle = '#4a5568'; ctx.font = `${10 * window.devicePixelRatio}px monospace`;
+      ctx.fillStyle = '#4a5568';
+      ctx.font = `${10 * window.devicePixelRatio}px monospace`;
       for (const db of dBLabels) {
         const y = padding + graphH * (1 - (db + 15) / 30);
         ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(w - padding, y); ctx.stroke();
         ctx.fillText(`${db > 0 ? '+' : ''}${db}dB`, 4, y + 3);
       }
       const zeroY = padding + graphH * 0.5;
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.beginPath(); ctx.moveTo(padding, zeroY); ctx.lineTo(w - padding, zeroY); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.beginPath(); ctx.moveTo(padding, zeroY); ctx.lineTo(w - padding, zeroY); ctx.stroke();
 
-      const targetCurve = TARGET_CURVES[document.getElementById('targetCurve').value] || TARGET_CURVES.flat;
-      ctx.beginPath(); ctx.setLineDash([4 * window.devicePixelRatio, 4 * window.devicePixelRatio]);
-      ctx.strokeStyle = '#ffcc00'; ctx.lineWidth = 2 * window.devicePixelRatio;
+      const stepX = graphW / 30;
+
+      // 1) Alvo
+      const curveType = document.getElementById('targetCurve').value;
+      const targetCurve = TARGET_CURVES[curveType] || TARGET_CURVES.flat;
+      ctx.beginPath();
+      ctx.setLineDash([4 * window.devicePixelRatio, 4 * window.devicePixelRatio]);
+      ctx.strokeStyle = '#ffcc00';
+      ctx.lineWidth = 2 * window.devicePixelRatio;
       for (let i = 0; i < 31; i++) {
-        const x = padding + i * stepX, y = padding + graphH * (1 - (targetCurve[i] + 15) / 30);
+        const x = padding + i * stepX;
+        const y = padding + graphH * (1 - (targetCurve[i] + 15) / 30);
         if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
-      ctx.stroke(); ctx.setLineDash([]);
+      ctx.stroke();
+      ctx.setLineDash([]);
 
+      // 2) Medido
       const plotData = state.correctedRTA || state.measuredRTA;
-      const plotReliability = state.correctedRTA ? (state.verifyReliable || state.lastReliable) : null;
+      const plotReliability = state.correctedRTA
+        ? (state.verifyReliable || state.lastReliable)
+        : null;
       let midSum = 0, midCount = 0;
-      for (let i = 14; i <= 20; i++) { if ((!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95) { midSum += plotData[i]; midCount++; } }
+      for (let i = 14; i <= 20; i++) {
+        if ((!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95) {
+          midSum += plotData[i]; midCount++;
+        }
+      }
       const ref = midCount ? midSum / midCount : 0;
 
-      ctx.beginPath(); ctx.strokeStyle = '#00d2ff'; ctx.lineWidth = 2.5 * window.devicePixelRatio;
+      ctx.beginPath();
+      ctx.strokeStyle = '#00d2ff';
+      ctx.lineWidth = 2.5 * window.devicePixelRatio;
       let hasPoint = false;
       for (let i = 0; i < 31; i++) {
-        if (!(!plotReliability || plotReliability[i]) || !Number.isFinite(plotData[i]) || plotData[i] <= -95) { hasPoint = false; continue; }
-        const x = padding + i * stepX, relVal = Math.max(-15, Math.min(15, plotData[i] - ref)), y = padding + graphH * (1 - (relVal + 15) / 30);
-        if (!hasPoint) ctx.moveTo(x, y); else ctx.lineTo(x, y); hasPoint = true;
+        const valid = (!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95;
+        if (!valid) { hasPoint = false; continue; }
+        const x = padding + i * stepX;
+        const relVal = Math.max(-15, Math.min(15, plotData[i] - ref));
+        const y = padding + graphH * (1 - (relVal + 15) / 30);
+        if (!hasPoint) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        hasPoint = true;
       }
       ctx.stroke();
 
-      // CORREÇÃO 7.1: Curva Prevista baseada na Sobreposição dos Filtros
-      if (state.correctedRTA && state.gainsDB.some(g => Math.abs(g) > 0.05)) {
-        ctx.beginPath(); ctx.strokeStyle = '#00e676'; ctx.lineWidth = 2 * window.devicePixelRatio;
+      // 3) Previsto Pós-EQ
+      // FIX DO BUG: Não desenha a linha verde no modo verificação (verifyReliable true) para não somar o EQ duas vezes
+      if (state.correctedRTA && !state.verifyReliable && state.gainsDB.some(g => Math.abs(g) > 0.05)) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#00e676';
+        ctx.lineWidth = 2 * window.devicePixelRatio;
         ctx.setLineDash([3 * window.devicePixelRatio, 3 * window.devicePixelRatio]);
         hasPoint = false;
-
-        const simulatedGains = simulateGEQResponse(state.gainsDB);
+        
+        // Simula a "suavidade" do GEQ para a linha verde ficar realista
+        const simulatedGains = new Array(31).fill(0);
+        for (let i = 0; i < 31; i++) {
+            let sum = state.gainsDB[i] * 2;
+            let w = 2;
+            if (i > 0) { sum += state.gainsDB[i-1] * 0.5; w += 0.5; }
+            if (i < 30) { sum += state.gainsDB[i+1] * 0.5; w += 0.5; }
+            simulatedGains[i] = sum / w;
+        }
 
         for (let i = 0; i < 31; i++) {
-          if (!(!plotReliability || plotReliability[i]) || !Number.isFinite(plotData[i]) || plotData[i] <= -95) { hasPoint = false; continue; }
+          const valid = (!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95;
+          if (!valid) { hasPoint = false; continue; }
           const predicted = plotData[i] + simulatedGains[i];
-          const x = padding + i * stepX, relVal = Math.max(-15, Math.min(15, predicted - ref)), y = padding + graphH * (1 - (relVal + 15) / 30);
-          if (!hasPoint) ctx.moveTo(x, y); else ctx.lineTo(x, y); hasPoint = true;
+          const x = padding + i * stepX;
+          const relVal = Math.max(-15, Math.min(15, predicted - ref));
+          const y = padding + graphH * (1 - (relVal + 15) / 30);
+          if (!hasPoint) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          hasPoint = true;
         }
-        ctx.stroke(); ctx.setLineDash([]);
+        ctx.stroke();
+        ctx.setLineDash([]);
       }
 
+      // 4) Pontos de ajuste
       for (let i = 0; i < 31; i++) {
         const val = state.gainsDB[i];
         if (Math.abs(val) > 0.1) {
-          const x = padding + i * stepX, y = padding + graphH * (1 - (val + 15) / 30);
-          ctx.fillStyle = val > 0 ? '#00e676' : '#ff5252'; ctx.beginPath(); ctx.arc(x, y, 4 * window.devicePixelRatio, 0, Math.PI * 2); ctx.fill();
+          const x = padding + i * stepX;
+          const y = padding + graphH * (1 - (val + 15) / 30);
+          ctx.fillStyle = val > 0 ? '#00e676' : '#ff5252';
+          ctx.beginPath();
+          ctx.arc(x, y, 4 * window.devicePixelRatio, 0, Math.PI * 2);
+          ctx.fill();
         }
       }
     }
@@ -1059,166 +1209,273 @@
       const container = document.getElementById('fadersRack');
       container.innerHTML = '';
       for (let i = 0; i < 31; i++) {
-        const col = document.createElement('div'); col.className = 'fader-col'; col.dataset.band = i;
-        col.innerHTML = `<div class="fader-db" id="faderDb_${i}">0.0</div><div class="fader-track" id="faderTrack_${i}"><div class="fader-center-line"></div><div class="fader-bar" id="faderBar_${i}"></div><div class="fader-thumb" id="faderThumb_${i}"></div></div><div class="fader-freq">${formatFreq(ISO_FREQUENCIES[i])}</div>`;
+        const col = document.createElement('div');
+        col.className = 'fader-col';
+        col.dataset.band = i;
+        col.innerHTML = `
+          <div class="fader-db" id="faderDb_${i}">0.0</div>
+          <div class="fader-track" id="faderTrack_${i}">
+            <div class="fader-center-line"></div>
+            <div class="fader-bar" id="faderBar_${i}"></div>
+            <div class="fader-thumb" id="faderThumb_${i}"></div>
+          </div>
+          <div class="fader-freq">${formatFreq(ISO_FREQUENCIES[i])}</div>`;
         container.appendChild(col);
       }
       updateAllFadersUi();
     }
 
     function updateFaderUi(i) {
-      const db = state.gainsDB[i], dbElem = document.getElementById(`faderDb_${i}`), bar = document.getElementById(`faderBar_${i}`), thumb = document.getElementById(`faderThumb_${i}`);
+      const db = state.gainsDB[i];
+      const dbElem = document.getElementById(`faderDb_${i}`);
+      const bar    = document.getElementById(`faderBar_${i}`);
+      const thumb  = document.getElementById(`faderThumb_${i}`);
       if (!dbElem) return;
-      dbElem.textContent = (db > 0 ? `+${db}` : `${db}`); dbElem.className = 'fader-db' + (db > 0.1 ? ' boost' : (db < -0.1 ? ' cut' : ''));
+
+      dbElem.textContent = (db > 0 ? `+${db}` : `${db}`);
+      dbElem.className = 'fader-db' + (db > 0.1 ? ' boost' : (db < -0.1 ? ' cut' : ''));
+
       thumb.style.top = `${((15 - db) / 30) * 100}%`;
-      if (db > 0) { bar.className = 'fader-bar boost'; bar.style.top = 'auto'; bar.style.bottom = '50%'; bar.style.height = `${(db / 15) * 50}%`; }
-      else if (db < 0) { bar.className = 'fader-bar cut'; bar.style.bottom = 'auto'; bar.style.top = '50%'; bar.style.height = `${(Math.abs(db) / 15) * 50}%`; }
-      else { bar.style.height = '0%'; }
+      if (db > 0) {
+        bar.className = 'fader-bar boost';
+        bar.style.top = 'auto'; bar.style.bottom = '50%';
+        bar.style.height = `${(db / 15) * 50}%`;
+      } else if (db < 0) {
+        bar.className = 'fader-bar cut';
+        bar.style.bottom = 'auto'; bar.style.top = '50%';
+        bar.style.height = `${(Math.abs(db) / 15) * 50}%`;
+      } else {
+        bar.style.height = '0%';
+      }
     }
 
     function updateAllFadersUi() { for (let i = 0; i < 31; i++) updateFaderUi(i); }
+
     function updateBypassUi() {
       const elem = document.getElementById('bypassState');
-      if (elem) { elem.textContent = state.isBypassed ? 'ATIVO' : 'INATIVO'; elem.style.color = state.isBypassed ? 'var(--danger)' : 'var(--success)'; }
+      if (elem) {
+        elem.textContent = state.isBypassed ? 'ATIVO' : 'INATIVO';
+        elem.style.color = state.isBypassed ? 'var(--danger)' : 'var(--success)';
+      }
     }
 
     function updateMixerControls() {
       const snapshotReady = mixer.isConnected && mixer.hasMasterEqSnapshot();
-      document.getElementById('btnApplyMixer').disabled = !snapshotReady || !!mixer.pendingApply || state.positions.length === 0 || !(state.lastReliable && state.lastReliable.filter(Boolean).length >= 4);
-      document.getElementById('btnResetFlat').disabled = !snapshotReady || !!mixer.pendingApply;
-      document.getElementById('btnUndo').disabled = !snapshotReady || !state.undoGains;
-      document.getElementById('btnToggleBypass').disabled = !mixer.isConnected || !Number.isFinite(mixer.params['m.eq.bypass']);
+      const apply  = document.getElementById('btnApplyMixer');
+      const reset  = document.getElementById('btnResetFlat');
+      const undo   = document.getElementById('btnUndo');
+      const bypass = document.getElementById('btnToggleBypass');
+      const enoughReliable = state.lastReliable && state.lastReliable.filter(Boolean).length >= 4;
+      if (apply)  apply.disabled  = !snapshotReady || !!mixer.pendingApply || state.positions.length === 0 || !enoughReliable;
+      if (reset)  reset.disabled  = !snapshotReady || !!mixer.pendingApply;
+      if (undo)   undo.disabled   = !snapshotReady || !state.undoGains;
+      if (bypass) bypass.disabled = !mixer.isConnected || !Number.isFinite(mixer.params['m.eq.bypass']);
     }
 
     function clearAnalysisData() {
-      state.positions = []; state.noiseBands = null; state.positionSNR = null;
-      state.measuredRTA = new Array(31).fill(-60); state.correctedRTA = null;
-      state.verifyReliable = null; state.gainsDB = new Array(31).fill(0); state.lastReliable = null;
-      updatePosUi(); updateAllFadersUi(); updateMixerControls(); renderVisualizer();
+      state.positions = [];
+      state.noiseBands = null;
+      state.positionSNR = null;
+      state.measuredRTA = new Array(31).fill(-60);
+      state.correctedRTA = null;
+      state.verifyReliable = null;
+      state.gainsDB = new Array(31).fill(0);
+      state.lastReliable = null;
+      updatePosUi();
+      updateAllFadersUi();
+      updateMixerControls();
+      renderVisualizer();
     }
 
     function recalculateFromPositions() {
       state.verifyReliable = null;
-      if (!state.positions.length) { state.gainsDB = new Array(31).fill(0); state.correctedRTA = null; state.positionSNR = null; state.lastReliable = null; }
-      else {
+      if (!state.positions.length) {
+        state.gainsDB = new Array(31).fill(0);
+        state.correctedRTA = null;
+        state.positionSNR = null;
+        state.lastReliable = null;
+      } else {
         state.positionSNR = computePositionSNR(state.positions, state.noiseBands);
         const avg = normalizedPowerAverage(state.positions);
-        state.measuredRTA = avg; state.gainsDB = calculateAutoEQ(avg);
+        state.measuredRTA = avg;
+        state.gainsDB = calculateAutoEQ(avg);
       }
-      updateAllFadersUi(); updateMixerControls(); renderVisualizer();
+      updateAllFadersUi();
+      updateMixerControls();
+      renderVisualizer();
     }
 
     function updateStatus(status, text) {
-      const badge = document.getElementById('statusBadge'), label = document.getElementById('statusText'), cb = document.getElementById('btnConnect');
-      badge.className = `status-badge ${status}`; label.textContent = text;
+      const badge = document.getElementById('statusBadge');
+      const label = document.getElementById('statusText');
+      badge.className = `status-badge ${status}`;
+      label.textContent = text;
+      const cb = document.getElementById('btnConnect');
       if (cb) cb.textContent = (status === 'connected' || status === 'connecting') ? 'Desconectar' : 'Conectar';
     }
 
     function log(msg, type = 'normal') {
-      const box = document.getElementById('logBox'), p = document.createElement('p');
-      p.className = type; p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-      box.appendChild(p); box.scrollTop = box.scrollHeight;
+      const box = document.getElementById('logBox');
+      const p = document.createElement('p');
+      p.className = type;
+      const time = new Date().toLocaleTimeString();
+      p.textContent = `[${time}] ${msg}`;
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
     }
 
-    function updatePosUi() {
-      const el = document.getElementById('posCount');
-      if (el) el.textContent = `${state.positions.length} região(ões)` + (state.noiseBands ? ' · ruído de fundo medido' : '');
-    }
-
+    /* ==========================================================================
+       5.1. PWA
+       ========================================================================== */
     let deferredInstallPrompt = null;
     const btnInstall = document.getElementById('btnInstall');
     const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+                        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    function showInstallButton() { if (btnInstall && !isStandaloneMode) btnInstall.style.display = 'inline-flex'; }
 
     window.addEventListener('beforeinstallprompt', (event) => {
-      event.preventDefault(); deferredInstallPrompt = event;
-      if (btnInstall && !isStandaloneMode) btnInstall.style.display = 'inline-flex';
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      showInstallButton();
     });
-    window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; if (btnInstall) btnInstall.style.display = 'none'; log('[PWA] Instalado.', 'success'); });
-    if (isIOSDevice && !isStandaloneMode && btnInstall) btnInstall.style.display = 'inline-flex';
-
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      if (btnInstall) btnInstall.style.display = 'none';
+      log('[PWA] Aplicativo instalado.', 'success');
+    });
+    if (isIOSDevice && !isStandaloneMode) showInstallButton();
     if (btnInstall) {
       btnInstall.addEventListener('click', async () => {
         if (deferredInstallPrompt) {
           deferredInstallPrompt.prompt();
           const choice = await deferredInstallPrompt.userChoice;
           log(`[PWA] Instalação ${choice.outcome === 'accepted' ? 'aceita' : 'cancelada'}.`, 'info');
-          deferredInstallPrompt = null; btnInstall.style.display = 'none'; return;
+          deferredInstallPrompt = null;
+          btnInstall.style.display = 'none';
+          return;
         }
-        if (isIOSDevice) alert('Para instalar no iPhone:\n1. Compartilhar.\n2. "Adicionar à Tela de Início".');
-        else alert('Para instalar no Android:\n1. Menu Chrome.\n2. "Instalar aplicativo".');
+        if (isIOSDevice) {
+          alert('Para instalar no iPhone/iPad:\n\n1. Toque em Compartilhar.\n2. Escolha "Adicionar à Tela de Início".\n3. Confirme.');
+        } else {
+          alert('Para instalar no Android:\n\n1. Abra o menu do Chrome (três pontos).\n2. Toque em "Instalar aplicativo".\n3. Confirme.');
+        }
       });
     }
 
+    /* ==========================================================================
+       6. EVENTOS
+       ========================================================================== */
     document.getElementById('btnConnect').addEventListener('click', () => {
       const ip = document.getElementById('mixerIp').value.trim();
-      if (!ip) { alert('Informe o IP.'); return; }
-      if (mixer.isConnected || mixer.isConnecting) mixer.disconnect(); else mixer.connect(ip);
+      if (!ip) { alert('Informe o IP da mesa Soundcraft.'); return; }
+      if (mixer.isConnected || mixer.isConnecting) mixer.disconnect();
+      else mixer.connect(ip);
     });
 
     document.getElementById('targetCurve').addEventListener('change', () => recalculateFromPositions());
 
     const btnStartRta = document.getElementById('btnStartRta');
-    const progressBox = document.getElementById('progressBox'), progressBar = document.getElementById('progressBar'), countdownTimer = document.getElementById('countdownTimer');
+    const progressBox = document.getElementById('progressBox');
+    const progressBar = document.getElementById('progressBar');
+    const countdownTimer = document.getElementById('countdownTimer');
+
+    function updatePosUi() {
+      const el = document.getElementById('posCount');
+      if (el) el.textContent = `${state.positions.length} região(ões)` + (state.noiseBands ? ' · ruído de fundo medido' : '');
+    }
 
     document.getElementById('micCalibrationFile').addEventListener('change', async event => {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       try {
         const parsed = parseMicCalibration(await file.text());
-        state.micCalibration = parsed; state.micCalibrationName = file.name;
-        document.getElementById('micCalibrationStatus').textContent = `${file.name} · ${parsed.length} pontos · ${parsed[0].hz} Hz a ${parsed[parsed.length - 1].hz} Hz`;
-        clearAnalysisData(); log(`[Microfone] Curva carregada: ${file.name}. Medições descartadas.`, 'success');
+        state.micCalibration = parsed;
+        state.micCalibrationName = file.name;
+        document.getElementById('micCalibrationStatus').textContent =
+          `${file.name} · ${parsed.length} pontos · ${parsed[0].hz} Hz a ${parsed[parsed.length - 1].hz} Hz`;
+        clearAnalysisData();
+        log(`[Microfone] Curva carregada: ${file.name}. Medições anteriores descartadas.`, 'success');
       } catch (err) {
-        state.micCalibration = null; state.micCalibrationName = null; event.target.value = '';
+        state.micCalibration = null;
+        state.micCalibrationName = null;
+        event.target.value = '';
         document.getElementById('micCalibrationStatus').textContent = 'Arquivo inválido.';
-        clearAnalysisData(); alert(`Erro: ${err.message}`);
+        clearAnalysisData();
+        alert(`Erro ao carregar a curva: ${err.message}`);
       }
     });
 
     document.getElementById('phoneHeuristic').addEventListener('change', (e) => {
       state.usePhoneHeuristic = e.target.checked;
-      log(`[Microfone] Compensação de celular ${state.usePhoneHeuristic ? 'ATIVADA' : 'desativada'}.`, 'info');
+      log(`[Microfone] Compensação heurística de celular ${state.usePhoneHeuristic ? 'ATIVADA' : 'desativada'}.`, 'info');
       if (state.positions.length) recalculateFromPositions();
     });
 
     btnStartRta.addEventListener('click', async () => {
       if (state.isAnalyzing) return;
       state.isAnalyzing = true;
+      
+      // FIX DO BUG DO IPHONE: Inicializa o microfone ANTES de qualquer await longo (como bypass da mesa)
+      // Se o AudioContext for criado depois do await, o iOS bloqueia o áudio por perder o "user gesture".
+      try {
+        await rta.init();
+      } catch (err) {
+        log(`[RTA] Falha ao iniciar microfone: ${err.message}`, 'error');
+        state.isAnalyzing = false;
+        return;
+      }
+
       const duration = parseInt(document.getElementById('sampleDuration').value, 10);
       const mode = document.getElementById('captureMode').value;
       const needsBaseline = mode === 'measure' || mode === 'noise';
-      state.correctedRTA = null; state.verifyReliable = null;
-      const connected = mixer.isConnected, bypassValue = mixer.params['m.eq.bypass'], autoBypass = connected && needsBaseline;
+      state.correctedRTA = null;
+      state.verifyReliable = null;
+      const connected = mixer.isConnected;
+      const bypassValue = mixer.params['m.eq.bypass'];
+      const autoBypass = connected && needsBaseline;
       let wasBypassed = state.isBypassed, changedBypass = false;
 
-      btnStartRta.disabled = true; progressBox.style.display = 'block'; progressBar.style.width = '0%';
+      btnStartRta.disabled = true;
+      progressBox.style.display = 'block';
+      progressBar.style.width = '0%';
 
       try {
         if (autoBypass) {
-          if (!Number.isFinite(bypassValue)) throw new Error('Aguarde leitura do bypass da mesa.');
+          if (!Number.isFinite(bypassValue)) {
+            throw new Error('A mesa está conectada, mas o estado atual do bypass ainda não foi lido.');
+          }
           wasBypassed = bypassValue === 1;
           if (!wasBypassed) { changedBypass = true; await mixer.setBypassAndWait(true, 2500); }
-          log('[RTA] Bypass confirmado antes da medição.', 'info');
-        } else if (mode === 'measure') log('[RTA] Sem conexão: confirme manualmente o bypass.', 'info');
-        if (mode === 'noise') log('[RTA] Ruído de fundo (ruído rosa desligado).', 'info');
-        if (mode === 'verify') log('[RTA] Verificação pós-EQ.', 'info');
+          log('[RTA] Bypass confirmado pela mesa antes da medição de referência.', 'info');
+        } else if (mode === 'measure') {
+          log('[RTA] Sem conexão com a mesa: confirme manualmente que o GEQ Master está flat ou em bypass.', 'info');
+        }
+        if (mode === 'noise')  log('[RTA] Meça o ruído ambiente com o ruído rosa desligado.', 'info');
+        if (mode === 'verify') log('[RTA] Verificação pós-EQ: mantenha o ruído rosa ligado e o EQ ativo.', 'info');
 
         const averaged = await rta.startCapture(duration, (pct, remaining) => {
-          progressBar.style.width = `${pct * 100}%`; countdownTimer.textContent = `Ouvindo: ${remaining}s`;
+          progressBar.style.width = `${pct * 100}%`;
+          countdownTimer.textContent = `Ouvindo: ${remaining}s`;
         });
         countdownTimer.textContent = 'Captura concluída';
 
         if (mode === 'noise') {
-          state.noiseBands = averaged; log('[RTA] Ruído de fundo armazenado.', 'success');
+          state.noiseBands = averaged;
+          log('[RTA] Ruído de fundo armazenado.', 'success');
           if (state.positions.length) recalculateFromPositions();
         } else if (mode === 'measure') {
-          state.positions.push(averaged); recalculateFromPositions();
+          state.positions.push(averaged);
+          recalculateFromPositions();
           const skipped = state.lastReliable ? state.lastReliable.filter(v => !v).length : 31;
           const reliableCount = state.lastReliable ? state.lastReliable.filter(Boolean).length : 0;
-          if (reliableCount < 4) log(`[Auto-EQ] Sem sugestão: apenas ${reliableCount} bandas confiáveis.`, 'error');
-          else log(`[Auto-EQ] ${state.positions.length} região(ões). ${skipped} banda(s) excluída(s).`, 'success');
-          if (state.positions.length < 3) log('[Orientação] Faça pelo menos 3 capturas.', 'info');
+          if (reliableCount < 4) {
+            log(`[Auto-EQ] Sem sugestão: apenas ${reliableCount} bandas confiáveis. Confira sinal, ruído e amostras.`, 'error');
+          } else {
+            log(`[Auto-EQ] ${state.positions.length} região(ões) na média. ${skipped} banda(s) excluída(s).`, 'success');
+          }
+          if (state.positions.length < 3) log('[Orientação] Faça pelo menos 3 capturas em regiões distintas.', 'info');
         } else {
           state.measuredRTA = averaged;
           const { err, reliable, anchorValid } = prepareMeasurement(averaged, { checkNoise: false });
@@ -1227,50 +1484,85 @@
           if (anchorValid && validErrors.length) {
             const rmsError = Math.sqrt(validErrors.reduce((s, v) => s + v * v, 0) / validErrors.length);
             const worst = validErrors.length ? err.findIndex((v, i) => reliable[i] && Math.abs(v) === Math.max(...validErrors.map(x => Math.abs(x)))) : 0;
-            log(`[Verificação] Desvio RMS ${rmsError.toFixed(1)} dB; Pior banda ${(err[worst] || 0).toFixed(1)} dB em ${formatFreq(ISO_FREQUENCIES[worst])} Hz.`, 'info');
-          } else log('[Verificação] Bandas insuficientes.', 'error');
+            log(`[Verificação] Desvio RMS ${rmsError.toFixed(1)} dB; maior desvio ${(err[worst] || 0).toFixed(1)} dB em ${formatFreq(ISO_FREQUENCIES[worst])} Hz.`, 'info');
+          } else {
+            log('[Verificação] Bandas insuficientes para comparação válida.', 'error');
+          }
         }
-        updatePosUi(); updateMixerControls(); renderVisualizer();
+        updatePosUi();
+        updateMixerControls();
+        renderVisualizer();
       } catch (err) {
-        alert(`Falha: ${err.message}`); log(`[RTA] ${err.message}`, 'error');
+        alert(`Falha na captura/análise: ${err.message}`);
+        log(`[RTA] ${err.message}`, 'error');
       } finally {
         if (changedBypass && mixer.isConnected) {
-          try { await mixer.setBypassAndWait(wasBypassed, 2500); log('[RTA] Bypass anterior restaurado.', 'info'); }
-          catch (e) { log(`[RTA] ERRO ao restaurar bypass: ${e.message}.`, 'error'); }
+          try {
+            await mixer.setBypassAndWait(wasBypassed, 2500);
+            log('[RTA] Estado anterior do bypass restaurado e confirmado.', 'info');
+          } catch (restoreError) {
+            log(`[RTA] ATENÇÃO: não foi possível confirmar restauração do bypass: ${restoreError.message}.`, 'error');
+          }
         }
-        state.isAnalyzing = false; btnStartRta.disabled = false;
+        state.isAnalyzing = false;
+        btnStartRta.disabled = false;
         setTimeout(() => { progressBox.style.display = 'none'; }, 1500);
       }
     });
 
-    document.getElementById('btnClearPos').addEventListener('click', () => { clearAnalysisData(); log('[RTA] Dados limpos.', 'info'); });
+    document.getElementById('btnClearPos').addEventListener('click', () => {
+      clearAnalysisData();
+      log('[RTA] Posições e ruído de fundo descartados.', 'info');
+    });
+
     document.getElementById('btnUndo').addEventListener('click', () => mixer.undo());
-    document.getElementById('audioInput').addEventListener('change', () => { rta.reset(); clearAnalysisData(); log('[Microfone] Entrada alterada.', 'info'); });
+
+    document.getElementById('audioInput').addEventListener('change', () => {
+      rta.reset();
+      clearAnalysisData();
+      log('[Microfone] Entrada alterada. Medições descartadas.', 'info');
+    });
 
     document.getElementById('btnApplyMixer').addEventListener('click', () => {
       const warnings = [];
-      if (!state.micCalibration && !state.usePhoneHeuristic) warnings.push('Sem curva de microfone ou compensação de celular (faixa útil: 125 Hz–8 kHz).');
-      if (!state.micCalibration && state.usePhoneHeuristic) warnings.push('Compensação heurística ativa: estimativa de graves.');
-      if (!state.noiseBands) warnings.push('Ruído de fundo não medido (sem SNR).');
-      if (state.positions.length < 3) warnings.push(`Apenas ${state.positions.length} região(ões). 3 a 5 são ideais.`);
-      warnings.push('A curva é uma sugestão. Verifique após aplicar.');
-      if (!confirm(`Aplicar no Master L/R?\n\n${warnings.join('\n\n')}`)) return;
+      if (!state.micCalibration && !state.usePhoneHeuristic) {
+        warnings.push('O microfone está sem curva individual e sem compensação heurística. A faixa útil é limitada a 125 Hz–8 kHz.');
+      }
+      if (!state.micCalibration && state.usePhoneHeuristic) {
+        warnings.push('Compensação heurística ativa: útil, mas é uma estimativa.');
+      }
+      if (!state.noiseBands) warnings.push('Ruído de fundo não foi medido; critério de SNR por banda não foi aplicado.');
+      if (state.positions.length < 3) warnings.push(`Somente ${state.positions.length} região(ões); 3 a 5 são preferíveis.`);
+      warnings.push('A curva é uma sugestão inicial. Verifique após aplicar.');
+      if (!confirm(`Antes de aplicar no Master L/R:\n\n${warnings.join('\n\n')}\n\nIsso substituirá as 31 bandas dos dois lados. Continuar?`)) return;
       mixer.applyMasterGEQ(state.gainsDB, state.gainsDB);
       updateMixerControls();
     });
 
     document.getElementById('btnResetFlat').addEventListener('click', () => {
-      if (confirm('Zerar as 31 bandas do GEQ Master?')) mixer.resetFlat();
+      if (!confirm('Zerar as 31 bandas do GEQ Master nos lados L e R?')) return;
+      mixer.resetFlat();
     });
+
     document.getElementById('btnToggleBypass').addEventListener('click', () => mixer.toggleBypass());
 
+    /* ==========================================================================
+       7. INIT
+       ========================================================================== */
     window.addEventListener('DOMContentLoaded', () => {
-      buildFadersUi(); resizeCanvas(); refreshInputs();
-      if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        document.getElementById('securityWarning').style.display = 'block';
-        log('[Segurança] Use HTTPS ou localhost para o microfone.', 'error');
+      buildFadersUi();
+      resizeCanvas();
+      refreshInputs();
+
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (!window.isSecureContext && !isLocalhost) {
+        const warn = document.getElementById('securityWarning');
+        if (warn) warn.style.display = 'block';
+        log('[Segurança] Contexto inseguro: microfone bloqueado.', 'error');
       }
-      updateBypassUi(); updateMixerControls();
+      updateBypassUi();
+      updateMixerControls();
+
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
           reg.update();
@@ -1283,7 +1575,8 @@
               }
             };
           };
-        }).catch(err => console.log('SW:', err));
+          log('[PWA] Service Worker registrado.', 'success');
+        }).catch((err) => console.log('SW registration error:', err));
       }
     });
   </script>
