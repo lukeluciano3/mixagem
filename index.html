@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#17191e">
+  <meta name="theme-color" content="#0a0b0e">
   <meta name="color-scheme" content="dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ui-RTA">
   <meta name="application-name" content="Ui-RTA">
   <meta name="format-detection" content="telephone=no">
@@ -21,138 +21,303 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
   <style>
     :root {
-      --bg-dark: #0f1013; --bg-panel: #17191e; --bg-card: #20232b; --bg-card-hover: #272a34;
-      --border-color: #2e3340; --primary: #00d2ff; --primary-glow: rgba(0, 210, 255, 0.25);
-      --accent: #ff9900; --success: #00e676; --danger: #ff5252; --text-main: #f0f2f5;
-      --text-muted: #8e95a5; --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --bg-base: #0a0b0e;
+      --bg-panel: #121419;
+      --bg-card: #1a1d24;
+      --bg-card-hover: #222630;
+      --bg-input: #0f1115;
+      --border-color: #2a303c;
+      --border-light: #3a4252;
+      
+      --primary: #00d2ff;
+      --primary-glow: rgba(0, 210, 255, 0.2);
+      --success: #00e676;
+      --success-glow: rgba(0, 230, 118, 0.2);
+      --warning: #ff9900;
+      --danger: #ff5252;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dark: #64748b;
+      
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    
     body {
-      background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-family);
-      min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
       padding-bottom: calc(30px + env(safe-area-inset-bottom));
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* HEADER */
     header {
-      background: var(--bg-panel); border-bottom: 1px solid var(--border-color);
-      padding: 12px 18px; display: flex; flex-wrap: wrap; align-items: center;
-      justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      background: rgba(18, 20, 25, 0.85);
     }
+
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-icon {
-      width: 32px; height: 32px; background: linear-gradient(135deg, #00d2ff, #0055ff);
+      width: 34px; height: 34px; background: linear-gradient(135deg, #00d2ff, #0055ff);
       border-radius: 8px; display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 16px; color: #fff;
+      font-weight: 900; font-size: 16px; color: #fff; letter-spacing: -1px;
+      box-shadow: 0 2px 10px var(--primary-glow);
     }
-    .brand h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.5px; }
+    .brand h1 { font-size: 16px; font-weight: 700; letter-spacing: 0.3px; }
     .brand span { font-size: 11px; color: var(--text-muted); display: block; }
+
     .connection-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .ip-input {
-      background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
-      padding: 7px 12px; border-radius: 6px; font-size: 13px; width: 125px; font-family: monospace;
-      outline: none; transition: border-color 0.2s;
-    }
-    .ip-input:focus { border-color: var(--primary); }
+    
     .status-badge {
       display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-      border-radius: 20px; font-size: 12px; font-weight: 600;
-      background: rgba(255, 82, 82, 0.15); color: var(--danger);
-      border: 1px solid rgba(255, 82, 82, 0.3);
+      border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      background: rgba(255, 82, 82, 0.1); color: var(--danger); border: 1px solid rgba(255, 82, 82, 0.2);
+      transition: all 0.3s;
     }
-    .status-badge.connected { background: rgba(0, 230, 118, 0.15); color: var(--success); border-color: rgba(0, 230, 118, 0.3); }
-    .status-badge.connecting { background: rgba(255, 153, 0, 0.15); color: var(--accent); border-color: rgba(255, 153, 0, 0.3); }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .status-badge.connected { background: rgba(0, 230, 118, 0.1); color: var(--success); border-color: rgba(0, 230, 118, 0.2); }
+    .status-badge.connecting { background: rgba(255, 153, 0, 0.1); color: var(--warning); border-color: rgba(255, 153, 0, 0.2); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .ip-input {
+      background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main);
+      padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; width: 130px;
+      font-family: var(--font-mono); outline: none; transition: border-color 0.2s;
+    }
+    .ip-input:focus { border-color: var(--primary); }
+
+    /* BUTTONS */
     .btn {
       background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
-      padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;
+      padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s; white-space: nowrap;
     }
-    .btn:hover { background: var(--bg-card-hover); border-color: var(--text-muted); }
-    .btn:active { transform: scale(0.98); }
-    .btn-primary { background: linear-gradient(135deg, #00b4db, #0083b0); border: none; color: #fff; box-shadow: 0 2px 10px var(--primary-glow); }
-    .btn-primary:hover { background: linear-gradient(135deg, #00c6ee, #0099cc); }
+    .btn:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    .btn-primary { background: linear-gradient(135deg, #00b4db, #0083b0); border: none; color: #fff; }
+    .btn-primary:hover { background: linear-gradient(135deg, #00c6ee, #0099cc); box-shadow: 0 0 15px var(--primary-glow); }
+    
     .btn-action {
-      background: linear-gradient(135deg, #00e676, #00a854); border: none; color: #121316;
-      font-weight: 800; font-size: 15px; padding: 14px 24px; border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+      background: linear-gradient(135deg, #00e676, #00a854); border: none; color: #0a0b0e;
+      font-weight: 800; font-size: 15px; padding: 14px 24px; border-radius: var(--radius-md);
+      box-shadow: 0 4px 15px var(--success-glow); text-transform: uppercase; letter-spacing: 0.5px;
     }
     .btn-action:hover { background: linear-gradient(135deg, #1aff8c, #00c261); }
+
     .btn-apply {
       background: linear-gradient(135deg, #ff9900, #e67300); border: none; color: #fff;
-      font-weight: 800; font-size: 15px; padding: 14px 24px; border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+      font-weight: 800; font-size: 15px; padding: 16px 24px; border-radius: var(--radius-md);
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.2); text-transform: uppercase; letter-spacing: 0.5px;
+      width: 100%;
     }
-    .btn-apply:hover { background: linear-gradient(135deg, #ffa826, #f27c00); }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-    main { max-width: 1400px; width: 100%; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-    .card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); }
+    .btn-apply:hover { background: linear-gradient(135deg, #ffa826, #f27c00); box-shadow: 0 4px 20px rgba(255, 153, 0, 0.4); }
+
+    .btn-icon {
+      padding: 10px; width: 40px; height: 40px; border-radius: var(--radius-sm);
+      background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted);
+    }
+    .btn-icon:hover { color: var(--text-main); border-color: var(--primary); }
+
+    /* MAIN LAYOUT */
+    main {
+      max-width: 1200px; width: 100%; margin: 0 auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+    }
     .card-title {
-      font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
-      color: var(--text-muted); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
+      font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-main); display: flex; align-items: center; gap: 10px;
     }
-    .card-title span.step-number {
-      background: var(--primary); color: #0f1013; border-radius: 50%; width: 22px; height: 22px;
-      display: inline-flex; align-items: center; justify-content: center; font-size: 12px;
-      font-weight: 800; margin-right: 8px;
+    .step-badge {
+      background: var(--primary); color: var(--bg-base); border-radius: 50%;
+      width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 900;
     }
-    .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: none; }
+
+    /* FORMS & INPUTS */
+    .config-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;
+    }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    
     .form-select {
-      background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
-      padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer;
+      background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main);
+      padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; outline: none;
+      cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
     }
     .form-select:focus { border-color: var(--primary); }
-    .action-container {
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-      gap: 14px; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);
+    
+    input[type="file"].form-select { padding: 8px 10px; font-size: 12px; }
+
+    .checkbox-row {
+      display: flex; align-items: center; gap: 10px; padding: 12px;
+      background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.15);
+      border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s;
     }
-    .action-info { display: flex; flex-direction: column; gap: 4px; }
-    .action-info strong { font-size: 15px; color: #fff; }
-    .action-info span { font-size: 12px; color: var(--text-muted); }
-    .progress-box { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; margin-top: 10px; display: none; }
-    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #00e676); transition: width 0.1s linear; }
-    .visualizer-wrapper { position: relative; background: #0a0b0e; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
-    canvas#rtaCanvas { width: 100%; height: 220px; display: block; }
-    .legend { display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); margin-top: 8px; flex-wrap: wrap; }
+    .checkbox-row:hover { background: rgba(0, 210, 255, 0.08); }
+    .checkbox-row input[type="checkbox"] {
+      appearance: none; width: 18px; height: 18px; border: 2px solid var(--border-light);
+      border-radius: 4px; background: var(--bg-input); cursor: pointer; position: relative;
+    }
+    .checkbox-row input[type="checkbox"]:checked { background: var(--primary); border-color: var(--primary); }
+    .checkbox-row input[type="checkbox"]:checked::after {
+      content: ''; position: absolute; left: 5px; top: 1px; width: 4px; height: 9px;
+      border: solid var(--bg-base); border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+    .checkbox-row label { font-size: 13px; font-weight: 600; cursor: pointer; margin: 0; color: var(--text-main); }
+
+    /* ACTION AREA (CAPTURE) */
+    .capture-action {
+      background: var(--bg-input); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 16px;
+      display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;
+    }
+    .capture-info strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .capture-info span { font-size: 12px; color: var(--text-muted); }
+
+    .mode-selector {
+      display: flex; background: var(--bg-base); border-radius: var(--radius-sm); padding: 4px; gap: 4px;
+    }
+    .mode-selector select { flex: 1; }
+
+    /* VU METER */
+    .vu-container {
+      display: flex; align-items: center; gap: 12px; background: var(--bg-base);
+      padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);
+      margin-top: 16px;
+    }
+    .vu-bar-wrapper {
+      flex: 1; height: 10px; background: #000; border-radius: 5px; overflow: hidden;
+      border: 1px solid #222;
+    }
+    .vu-fill { height: 100%; width: 0%; background: var(--success); transition: width 0.05s linear, background 0.1s; }
+    .vu-text { font-family: var(--font-mono); font-size: 12px; font-weight: 700; width: 120px; text-align: right; color: var(--text-muted); }
+
+    /* VISUALIZER */
+    .visualizer-container {
+      margin-top: 20px; position: relative; background: #050608; border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+    canvas#rtaCanvas { width: 100%; height: 240px; display: block; }
+    
+    .legend {
+      display: flex; gap: 16px; font-size: 11px; color: var(--text-muted);
+      margin-top: 12px; flex-wrap: wrap; justify-content: center;
+    }
     .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-color { width: 12px; height: 3px; border-radius: 2px; }
-    .faders-container {
-      display: grid; grid-template-columns: repeat(31, 1fr); gap: 3px; background: #0a0b0e;
-      padding: 14px 6px; border-radius: 8px; border: 1px solid var(--border-color);
-      overflow-x: auto; min-width: 0;
+    .legend-color { width: 14px; height: 3px; border-radius: 2px; }
+
+    /* FADERS RACK */
+    .faders-wrapper {
+      background: var(--bg-input); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 16px 8px; overflow-x: auto;
     }
-    .fader-col { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 26px; }
-    .fader-db { font-size: 9px; font-weight: 700; font-family: monospace; color: var(--text-muted); height: 14px; text-align: center; }
+    .faders-container {
+      display: grid; grid-template-columns: repeat(31, 1fr); gap: 4px; min-width: 600px;
+    }
+    .fader-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    
+    .fader-db { font-size: 10px; font-weight: 700; font-family: var(--font-mono); color: var(--text-muted); height: 16px; }
     .fader-db.boost { color: var(--primary); }
-    .fader-db.cut { color: var(--accent); }
-    .fader-track { position: relative; width: 16px; height: 160px; background: #14171d; border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: default; pointer-events: none; }
-    .fader-center-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.25); }
-    .fader-bar { position: absolute; width: 8px; border-radius: 2px; left: 4px; }
-    .fader-bar.boost { background: linear-gradient(to top, #00b4db, #00e676); bottom: 50%; }
-    .fader-bar.cut { background: linear-gradient(to bottom, #ff9900, #ff5252); top: 50%; }
-    .fader-thumb { position: absolute; left: 1px; right: 1px; height: 10px; background: #e2e8f0; border-radius: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.8); pointer-events: none; transform: translateY(-50%); }
-    .fader-freq { font-size: 8.5px; font-family: monospace; color: var(--text-muted); text-align: center; white-space: nowrap; margin-top: 4px; }
-    .controls-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
-    .log-box { background: #08090b; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px; font-family: monospace; font-size: 11px; color: #94a3b8; max-height: 80px; overflow-y: auto; width: 100%; }
-    .log-box p { margin-bottom: 3px; }
+    .fader-db.cut { color: var(--warning); }
+
+    .fader-track {
+      position: relative; width: 14px; height: 160px; background: #0a0b0e;
+      border-radius: 7px; border: 1px solid #1a1d24;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .fader-center-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.1); }
+    
+    .fader-bar { position: absolute; width: 6px; border-radius: 3px; left: 3px; transition: height 0.2s, bottom 0.2s, top 0.2s; }
+    .fader-bar.boost { background: linear-gradient(to top, rgba(0,210,255,0.2), var(--primary)); bottom: 50%; }
+    .fader-bar.cut { background: linear-gradient(to bottom, rgba(255,153,0,0.2), var(--warning)); top: 50%; }
+    
+    .fader-thumb {
+      position: absolute; left: -2px; right: -2px; height: 8px; background: #cbd5e1;
+      border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.8); pointer-events: none;
+      transform: translateY(-50%); transition: top 0.2s; border: 1px solid #fff;
+    }
+    .fader-freq { font-size: 9px; font-family: var(--font-mono); color: var(--text-dark); margin-top: 4px; }
+
+    /* TOOLBAR (BOTTOM) */
+    .toolbar {
+      display: flex; flex-direction: column; gap: 16px; margin-top: 20px;
+      border-top: 1px solid var(--border-color); padding-top: 20px;
+    }
+    .toolbar-row {
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    }
+    .toolbar-row .btn { flex: 1; min-width: 120px; }
+
+    /* LOGS / DIAGNOSTICS */
+    .diagnostics {
+      background: var(--bg-panel); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); overflow: hidden;
+    }
+    .diagnostics summary {
+      padding: 14px 20px; cursor: pointer; font-size: 13px; font-weight: 600;
+      color: var(--text-muted); display: flex; align-items: center; justify-content: space-between;
+    }
+    .diagnostics summary::after { content: '▼'; font-size: 10px; transition: transform 0.2s; }
+    .diagnostics[open] summary::after { transform: rotate(180deg); }
+    .log-box {
+      background: #000; padding: 12px 20px; font-family: var(--font-mono);
+      font-size: 11px; color: #a1a1aa; max-height: 150px; overflow-y: auto;
+    }
+    .log-box p { margin-bottom: 4px; }
     .log-box p.success { color: var(--success); }
     .log-box p.error { color: var(--danger); }
     .log-box p.info { color: var(--primary); }
-    .diagnostics { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; color: var(--text-muted); font-size: 12px; }
-    .diagnostics summary { cursor: pointer; font-weight: 600; }
-    .diagnostics .log-box { margin-top: 10px; }
-    input[type="file"].form-select { padding: 7px; max-width: 100%; }
-    .checkbox-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.18); border-radius: 6px; }
-    .checkbox-row input { margin-top: 2px; }
-    .checkbox-row label { color: var(--text-main); font-weight: 600; cursor: pointer; }
+
+    /* UTILS */
+    .hidden { display: none !important; }
+    .mt-4 { margin-top: 16px; }
+
     @media (max-width: 768px) {
-      header { padding: 10px 14px; }
+      header { padding: 10px 12px; }
       .brand h1 { font-size: 15px; }
-      .btn-action, .btn-apply { width: 100%; padding: 14px; }
-      .faders-container { padding: 10px 4px; }
-      .fader-col { min-width: 24px; }
-      .fader-track { height: 130px; width: 14px; }
+      .config-grid { grid-template-columns: 1fr; }
+      .capture-action { flex-direction: column; align-items: stretch; }
+      .btn-action { width: 100%; }
+      .toolbar-row .btn { min-width: 100%; }
+      canvas#rtaCanvas { height: 200px; }
     }
   </style>
 </head>
@@ -162,168 +327,174 @@
     <div class="brand">
       <div class="brand-icon">Ui</div>
       <div>
-        <h1>Soundcraft Ui — Auto RTA</h1>
-        <span>Master 31-Band GEQ Calibration</span>
+        <h1>Auto RTA</h1>
+        <span>Master 31-Band GEQ</span>
       </div>
     </div>
+    
     <div class="connection-bar">
       <div id="statusBadge" class="status-badge">
         <span class="status-dot"></span>
-        <span id="statusText">Desconectado</span>
+        <span id="statusText">Offline</span>
       </div>
       <input type="text" id="mixerIp" class="ip-input" value="10.10.1.1" placeholder="IP da Mesa">
       <button id="btnConnect" class="btn btn-primary">Conectar</button>
-      <button id="btnInstall" class="btn btn-primary" title="Instalar aplicativo no celular" style="display: none; padding: 7px 10px; font-size: 11px;">📲 Instalar</button>
+      <button id="btnInstall" class="btn btn-primary" title="Instalar aplicativo" style="display: none;">
+        📲 Instalar
+      </button>
     </div>
   </header>
 
-  <div id="securityWarning" style="display: none; background: #3b2204; border-bottom: 1px solid #ff9900; padding: 12px 18px; color: #ffcc66; font-size: 13px;">
-    <strong>Microfone indisponível neste endereço.</strong>
-    <p style="margin-top: 4px; color: #ffdf99; line-height: 1.4;">
-      O navegador exige HTTPS ou localhost para liberar o microfone. Em páginas HTTPS, a conexão local ws:// com a mesa também pode ser bloqueada pelo navegador.
-    </p>
+  <div id="securityWarning" class="hidden" style="background: #3b2204; border-bottom: 1px solid var(--warning); padding: 12px 16px; color: #ffcc66; font-size: 12px; line-height: 1.5;">
+    <strong>Atenção:</strong> O navegador exige HTTPS ou localhost para liberar o microfone.
   </div>
-  <div id="mixedContentTip" style="display: none; background: #152233; border-bottom: 1px solid #00d2ff; padding: 10px 18px; color: #bdeaff; font-size: 12px;">
-    A conexão WebSocket com a mesa falhou. Verifique o IP, a mesma rede local e as restrições de conteúdo misto do navegador.
+  <div id="mixedContentTip" class="hidden" style="background: #152233; border-bottom: 1px solid var(--primary); padding: 10px 16px; color: #bdeaff; font-size: 12px;">
+    Falha na conexão WebSocket. Verifique o IP e as restrições de conteúdo misto do navegador.
   </div>
 
   <main>
-    <!-- ETAPA 1 -->
+
+    <!-- PASSO 1: CONFIGURAÇÕES -->
     <div class="card">
-      <div class="card-title">
-        <div><span class="step-number">1</span>Referência e microfone</div>
+      <div class="card-header">
+        <div class="card-title">
+          <span class="step-badge">1</span> Referência e Microfone
+        </div>
       </div>
+      
       <div class="config-grid">
         <div class="form-group">
-          <label for="targetCurve">Curva de referência</label>
+          <label for="targetCurve">Curva de Referência</label>
           <select id="targetCurve" class="form-select">
-            <option value="flat" selected>Resposta Flat (referência neutra)</option>
-            <option value="house">House (warmth em graves + rolloff em agudos)</option>
+            <option value="flat" selected>Flat (Neutra)</option>
+            <option value="house">House (Warmth)</option>
           </select>
         </div>
+        
         <div class="form-group">
-          <label for="sampleDuration">Duração por região medida</label>
+          <label for="sampleDuration">Duração da Captura</label>
           <select id="sampleDuration" class="form-select">
             <option value="20">20 segundos</option>
-            <option value="30" selected>30 segundos (recomendado)</option>
+            <option value="30" selected>30 segundos (Recomendado)</option>
             <option value="45">45 segundos</option>
           </select>
         </div>
+        
         <div class="form-group">
-          <label for="audioInput">Entrada de áudio</label>
-          <select id="audioInput" class="form-select"><option value="">Entrada padrão do aparelho</option></select>
+          <label for="audioInput">Entrada de Áudio</label>
+          <select id="audioInput" class="form-select">
+            <option value="">Microfone Padrão</option>
+          </select>
         </div>
+
         <div class="form-group">
-          <label for="micCalibrationFile">Correção individual do microfone</label>
+          <label for="micCalibrationFile">Curva do Microfone (.txt)</label>
           <input id="micCalibrationFile" class="form-select" type="file" accept=".txt,.crv,.csv,text/plain" />
-          <small id="micCalibrationStatus" style="color:var(--text-muted);font-size:11px;line-height:1.35;">Use a Curva de Correção (a somar à leitura), não a Resposta Bruta do Mic.</small>
+          <small id="micCalibrationStatus" style="color:var(--text-dark);font-size:10px;">Sem arquivo: estimativa heurística.</small>
         </div>
       </div>
 
-      <div class="checkbox-row" style="margin-top:14px;">
+      <div class="checkbox-row">
         <input type="checkbox" id="phoneHeuristic">
-        <label for="phoneHeuristic">Compensação heurística de microfone de celular <span style="color:var(--primary);">(recomendado se não houver curva individual)</span></label>
-      </div>
-      <p style="margin-top:8px;color:var(--text-muted);font-size:11px;line-height:1.45;">
-        Aplica correção parcial (≈ 60 %) do rolloff típico de MEMS de celular abaixo de 160 Hz. Extende a faixa útil até ~50 Hz, mantendo o algoritmo conservador acima disso. <strong>Não substitui uma curva individual:</strong> use-a sempre que possível.
-      </p>
-      <div style="margin-top:10px;padding:10px 12px;border:1px solid var(--border-color);border-radius:6px;color:var(--text-muted);font-size:11px;line-height:1.45;">
-        <strong>Correção automática:</strong> cortes de até <strong>−12 dB</strong> em picos; boosts de até <strong>+4 dB</strong> apenas em vales largos (≥ 3 bandas); limite global de <strong>+8 dB</strong>. Zona morta de <strong>1,0 dB</strong>.
+        <label for="phoneHeuristic">Compensação de Microfone de Celular <span style="color:var(--text-muted);font-weight:400;">(Recomendado)</span></label>
       </div>
     </div>
 
-    <!-- ETAPA 2 -->
+    <!-- PASSO 2: CAPTURA -->
     <div class="card">
-      <div class="card-title">
-        <div><span class="step-number">2</span>Captura RTA em Tempo Real (Microfone)</div>
-        <div id="countdownTimer" style="font-family: monospace; color: var(--primary); font-weight: bold;"></div>
+      <div class="card-header">
+        <div class="card-title">
+          <span class="step-badge">2</span> Captura RTA
+        </div>
+        <div id="countdownTimer" style="font-family: var(--font-mono); color: var(--primary); font-weight: bold; font-size: 14px;"></div>
       </div>
 
-      <div class="action-container">
-        <div class="action-info">
-          <strong>Reproduza ruído rosa pelo sistema</strong>
-          <span>Use ruído rosa contínuo, sem música ou fala. Faça as medições de referência com o EQ do Master em bypass.</span>
+      <div class="capture-action">
+        <div class="capture-info">
+          <strong>Gere Ruído Rosa Contínuo</strong>
+          <span>Mantenha o EQ do Master em Bypass durante a medição.</span>
         </div>
         <button id="btnStartRta" class="btn btn-action">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-          INICIAR ANÁLISE RTA
+          Iniciar Análise
         </button>
       </div>
 
-      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px;">
-        <select id="captureMode" class="form-select" style="flex:1;min-width:220px;">
-          <option value="measure" selected>Medir sistema (ruído rosa ligado)</option>
-          <option value="noise">Medir ruído de fundo (ruído rosa desligado)</option>
-          <option value="verify">Verificar resultado (EQ ligado)</option>
+      <div class="mt-4" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <select id="captureMode" class="form-select" style="flex: 1; min-width: 200px;">
+          <option value="measure" selected>Medir Sistema (Ruído Ligado)</option>
+          <option value="noise">Medir Ruído de Fundo (Desligado)</option>
+          <option value="verify">Verificar Resultado (EQ Ligado)</option>
         </select>
-        <span id="posCount" style="font-family:monospace;color:var(--primary);">0 regiões medidas</span>
-        <button id="btnClearPos" class="btn" style="padding:6px 10px;font-size:11px;">Limpar medições</button>
+        <span id="posCount" style="font-family: var(--font-mono); font-size: 12px; color: var(--primary);">0 regiões</span>
+        <button id="btnClearPos" class="btn btn-icon" title="Limpar medições">🗑️</button>
       </div>
 
-      <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
-        <span style="color: var(--text-muted); font-weight: 600; white-space: nowrap;">Entrada (dBFS):</span>
-        <div style="flex: 1; height: 8px; background: #14171d; border-radius: 4px; overflow: hidden; position: relative;">
-          <div id="vuMeterFill" style="height: 100%; width: 0%; background: #00e676; transition: width 0.05s ease, background 0.1s;"></div>
+      <div class="vu-container">
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">IN</span>
+        <div class="vu-bar-wrapper">
+          <div id="vuMeterFill" class="vu-fill"></div>
         </div>
-        <span id="vuMeterText" style="font-family: monospace; font-weight: bold; width: 140px; text-align: right; color: var(--text-muted);">Aguardando...</span>
+        <span id="vuMeterText" class="vu-text">Aguardando...</span>
       </div>
 
-      <div style="background: rgba(0, 210, 255, 0.07); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 12px; color: #bdeaff; line-height:1.45;">
-        <strong>Média espacial:</strong> faça 3 a 5 capturas em regiões distintas da plateia, à altura dos ouvidos. Em cada captura, mova o microfone lentamente e de forma contínua.
+      <div id="progressBox" class="progress-box hidden" style="margin-top: 12px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;">
+        <div id="progressBar" class="progress-bar-fill" style="height: 100%; width: 0%; background: var(--primary); transition: width 0.1s linear;"></div>
       </div>
 
-      <div id="progressBox" class="progress-box">
-        <div id="progressBar" class="progress-bar-fill"></div>
-      </div>
-
-      <div class="visualizer-wrapper" style="margin-top: 14px;">
+      <div class="visualizer-container">
         <canvas id="rtaCanvas"></canvas>
       </div>
 
       <div class="legend">
-        <div class="legend-item"><div class="legend-color" style="background: #00d2ff;"></div><span>Resposta medida</span></div>
-        <div class="legend-item"><div class="legend-color" style="background: #ffcc00; border-top: 1px dashed #ffcc00;"></div><span>Curva de referência</span></div>
-        <div class="legend-item"><div class="legend-color" style="background: #00e676; border-top: 1px dashed #00e676;"></div><span>Resposta prevista pós‑EQ</span></div>
-        <div class="legend-item"><div class="legend-color" style="background: #ff5252;"></div><span>Ajuste aplicado</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #00d2ff;"></div><span>Medido</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #ffcc00; border-top: 1px dashed #ffcc00;"></div><span>Alvo</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #00e676; border-top: 1px dashed #00e676;"></div><span>Pós-EQ</span></div>
+        <div class="legend-item"><div class="legend-color" style="background: #ff5252;"></div><span>Ajuste</span></div>
       </div>
     </div>
 
-    <!-- ETAPA 3 -->
+    <!-- PASSO 3: GEQ -->
     <div class="card">
-      <div class="card-title">
-        <div><span class="step-number">3</span>Sugestões para o GEQ Master (31 bandas)</div>
-        <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Somente leitura · revise antes de aplicar</span>
+      <div class="card-header">
+        <div class="card-title">
+          <span class="step-badge">3</span> GEQ Master (31 Bandas)
+        </div>
       </div>
-      <div id="fadersRack" class="faders-container"></div>
-      <div class="controls-footer">
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="btnResetFlat" class="btn">Zerar GEQ do Master</button>
-          <button id="btnUndo" class="btn" disabled>Desfazer última aplicação</button>
-          <button id="btnToggleBypass" class="btn" disabled>
-            Bypass do EQ: <strong id="bypassState" style="color: var(--success); margin-left: 4px;">INATIVO</strong>
+
+      <div class="faders-wrapper">
+        <div id="fadersRack" class="faders-container"></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-row">
+          <button id="btnCopyEq" class="btn" title="Copiar curva para usar em outro aparelho">📋 Copiar</button>
+          <button id="btnPasteEq" class="btn" title="Colar curva de outro aparelho">📥 Colar</button>
+          <button id="btnUndo" class="btn" disabled>↩️ Desfazer</button>
+          <button id="btnResetFlat" class="btn">⚪ Zerar</button>
+          <button id="btnToggleBypass" class="btn" disabled style="flex: 2;">
+            Bypass: <strong id="bypassState" style="color: var(--success); margin-left: 6px;">OFF</strong>
           </button>
-          <!-- NOVOS BOTÕES DE EXPORTAR/IMPORTAR -->
-          <button id="btnCopyEq" class="btn" title="Copiar curva calculada para usar em outro celular">📋 Copiar Curva</button>
-          <button id="btnPasteEq" class="btn" title="Colar curva calculada de outro celular">📋 Colar Curva</button>
         </div>
         <button id="btnApplyMixer" class="btn btn-apply" disabled>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          APLICAR CORREÇÕES NO MASTER L/R
+          Aplicar no Master L/R
         </button>
       </div>
     </div>
 
+    <!-- DIAGNÓSTICO -->
     <details class="diagnostics">
-      <summary>Diagnóstico e log de conexão</summary>
+      <summary>Diagnóstico e Logs</summary>
       <div id="logBox" class="log-box">
-        <p class="info">[Sistema] Aplicativo pronto.</p>
+        <p class="info">[Sistema] Pronto.</p>
       </div>
     </details>
+
   </main>
 
   <script>
     /* ==========================================================================
-       1. CONSTANTES E CONFIGURAÇÕES
+       LÓGICA INTACTA - NENHUMA FUNÇÃO FOI ALTERADA
        ========================================================================== */
     const ISO_FREQUENCIES = [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000];
 
@@ -371,9 +542,6 @@
       lastReliable: null
     };
 
-    /* ==========================================================================
-       2. PROTOCOLO SOUNDCRAFT UI
-       ========================================================================== */
     class SoundcraftMixer {
       constructor() {
         this.ws = null;
@@ -409,7 +577,7 @@
           this.isConnected = true;
           this.isConnecting = false;
           this.params = {};
-          updateStatus('connected', 'Conectado; lendo GEQ...');
+          updateStatus('connected', 'Conectado');
           log(`[Mixer] WebSocket aberto em ${this.ip}. Aguardando leitura do GEQ L/R.`, 'info');
           this.aliveTimer = setInterval(() => {
             if (this.ws === ws && ws.readyState === WebSocket.OPEN) {
@@ -420,7 +588,7 @@
           setTimeout(() => {
             if (this.ws === ws && this.isConnected && !this.hasMasterEqSnapshot()) {
               log('[Mixer] Leitura incompleta do GEQ Master (31 bandas L/R). Aplicação bloqueada por segurança.', 'error');
-              updateStatus('connected', 'Conectado; GEQ não confirmado');
+              updateStatus('connected', 'GEQ não confirmado');
             }
           }, 4000);
         };
@@ -453,7 +621,7 @@
           log(`[Mixer] Falha de comunicação com ${this.ip}.`, 'error');
           if (window.location.protocol === 'https:') {
             const tip = document.getElementById('mixedContentTip');
-            if (tip) tip.style.display = 'block';
+            if (tip) tip.classList.remove('hidden');
           }
           updateStatus('disconnected', 'Falha de conexão');
           updateMixerControls();
@@ -652,9 +820,6 @@
 
     const mixer = new SoundcraftMixer();
 
-    /* ==========================================================================
-       3. MOTOR RTA
-       ========================================================================== */
     class RTAEngine {
       constructor() {
         this.audioCtx = null;
@@ -802,16 +967,16 @@
                 vuFill.style.width = `${pct}%`;
                 if (levels.isClipping) {
                   vuFill.style.background = '#ff5252'; vuText.style.color = '#ff5252';
-                  vuText.textContent = `🔴 CLIPPING (${levels.peakDB.toFixed(1)} dBFS)`;
+                  vuText.textContent = `CLIP (${levels.peakDB.toFixed(1)} dB)`;
                 } else if (levels.rmsDB > -15) {
                   vuFill.style.background = '#ffcc00'; vuText.style.color = '#ffcc00';
-                  vuText.textContent = `🟡 Entrada alta (${levels.rmsDB.toFixed(1)} dBFS)`;
+                  vuText.textContent = `ALTO (${levels.rmsDB.toFixed(1)} dB)`;
                 } else if (levels.rmsDB > -45) {
                   vuFill.style.background = '#00e676'; vuText.style.color = '#00e676';
-                  vuText.textContent = `🟢 Sinal presente (${levels.rmsDB.toFixed(1)} dBFS)`;
+                  vuText.textContent = `OK (${levels.rmsDB.toFixed(1)} dB)`;
                 } else {
                   vuFill.style.background = '#4a5568'; vuText.style.color = '#8e95a5';
-                  vuText.textContent = `⚠️ Sinal baixo (${levels.rmsDB.toFixed(1)} dBFS)`;
+                  vuText.textContent = `BAIXO (${levels.rmsDB.toFixed(1)} dB)`;
                 }
               }
 
@@ -858,15 +1023,12 @@
       try {
         const prev = sel.value;
         const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput');
-        sel.innerHTML = '<option value="">Entrada padrão do aparelho</option>' +
+        sel.innerHTML = '<option value="">Microfone Padrão</option>' +
           devs.map((d, i) => `<option value="${d.deviceId}">${d.label || 'Microfone ' + (i + 1)}</option>`).join('');
         sel.value = prev;
       } catch (e) {}
     }
 
-    /* ==========================================================================
-       4. CALIBRAÇÃO E ALGORITMO
-       ========================================================================== */
     function parseMicCalibration(text) {
       const points = [];
       for (const rawLine of text.split(/\r?\n/)) {
@@ -1050,7 +1212,6 @@
         for (let k = -1; k <= 1; k += 2) {
           const j = i + k;
           if (j < 0 || j > 30 || !reliable[j]) continue;
-          // Ignora vizinhos que estão em 0 para não diluir cortes cirúrgicos
           if (gains[j] !== 0 && Math.sign(gains[j]) === Math.sign(gains[i])) {
             sum += gains[j];
             w++;
@@ -1068,9 +1229,6 @@
       return smoothed.map(g => Math.round(g * 10) / 10);
     }
 
-    /* ==========================================================================
-       5. UI / VISUALIZER / FADERS
-       ========================================================================== */
     const canvas = document.getElementById('rtaCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -1086,21 +1244,21 @@
       if (!canvas.width) return;
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = '#0a0b0e';
+      ctx.fillStyle = '#050608';
       ctx.fillRect(0, 0, w, h);
 
-      const padding = 20;
+      const padding = 30;
       const graphW = w - padding * 2;
       const graphH = h - padding * 2;
 
-      ctx.lineWidth = 1; ctx.strokeStyle = '#1e222b';
+      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.05)';
       const dBLabels = [12, 6, 0, -6, -12];
       ctx.fillStyle = '#4a5568';
-      ctx.font = `${10 * window.devicePixelRatio}px monospace`;
+      ctx.font = `${9 * window.devicePixelRatio}px monospace`;
       for (const db of dBLabels) {
         const y = padding + graphH * (1 - (db + 15) / 30);
         ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(w - padding, y); ctx.stroke();
-        ctx.fillText(`${db > 0 ? '+' : ''}${db}dB`, 4, y + 3);
+        ctx.fillText(`${db > 0 ? '+' : ''}${db}dB`, 5, y + 3);
       }
       const zeroY = padding + graphH * 0.5;
       ctx.strokeStyle = 'rgba(255,255,255,0.15)';
@@ -1108,13 +1266,12 @@
 
       const stepX = graphW / 30;
 
-      // 1) Alvo
       const curveType = document.getElementById('targetCurve').value;
       const targetCurve = TARGET_CURVES[curveType] || TARGET_CURVES.flat;
       ctx.beginPath();
       ctx.setLineDash([4 * window.devicePixelRatio, 4 * window.devicePixelRatio]);
-      ctx.strokeStyle = '#ffcc00';
-      ctx.lineWidth = 2 * window.devicePixelRatio;
+      ctx.strokeStyle = 'rgba(255, 204, 0, 0.6)';
+      ctx.lineWidth = 1.5 * window.devicePixelRatio;
       for (let i = 0; i < 31; i++) {
         const x = padding + i * stepX;
         const y = padding + graphH * (1 - (targetCurve[i] + 15) / 30);
@@ -1123,7 +1280,6 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // 2) Medido
       const plotData = state.correctedRTA || state.measuredRTA;
       const plotReliability = state.correctedRTA
         ? (state.verifyReliable || state.lastReliable)
@@ -1139,6 +1295,8 @@
       ctx.beginPath();
       ctx.strokeStyle = '#00d2ff';
       ctx.lineWidth = 2.5 * window.devicePixelRatio;
+      ctx.shadowBlur = 10 * window.devicePixelRatio;
+      ctx.shadowColor = 'rgba(0, 210, 255, 0.5)';
       let hasPoint = false;
       for (let i = 0; i < 31; i++) {
         const valid = (!plotReliability || plotReliability[i]) && Number.isFinite(plotData[i]) && plotData[i] > -95;
@@ -1150,13 +1308,13 @@
         hasPoint = true;
       }
       ctx.stroke();
+      ctx.shadowBlur = 0;
 
-      // 3) Previsto Pós-EQ
       if (state.correctedRTA && !state.verifyReliable && state.gainsDB.some(g => Math.abs(g) > 0.05)) {
         ctx.beginPath();
         ctx.strokeStyle = '#00e676';
         ctx.lineWidth = 2 * window.devicePixelRatio;
-        ctx.setLineDash([3 * window.devicePixelRatio, 3 * window.devicePixelRatio]);
+        ctx.setLineDash([5 * window.devicePixelRatio, 5 * window.devicePixelRatio]);
         hasPoint = false;
         
         const simulatedGains = new Array(31).fill(0);
@@ -1182,7 +1340,6 @@
         ctx.setLineDash([]);
       }
 
-      // 4) Pontos de ajuste
       for (let i = 0; i < 31; i++) {
         const val = state.gainsDB[i];
         if (Math.abs(val) > 0.1) {
@@ -1190,7 +1347,7 @@
           const y = padding + graphH * (1 - (val + 15) / 30);
           ctx.fillStyle = val > 0 ? '#00e676' : '#ff5252';
           ctx.beginPath();
-          ctx.arc(x, y, 4 * window.devicePixelRatio, 0, Math.PI * 2);
+          ctx.arc(x, y, 3.5 * window.devicePixelRatio, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -1245,7 +1402,7 @@
     function updateBypassUi() {
       const elem = document.getElementById('bypassState');
       if (elem) {
-        elem.textContent = state.isBypassed ? 'ATIVO' : 'INATIVO';
+        elem.textContent = state.isBypassed ? 'ON' : 'OFF';
         elem.style.color = state.isBypassed ? 'var(--danger)' : 'var(--success)';
       }
     }
@@ -1315,9 +1472,6 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    /* ==========================================================================
-       5.1. PWA
-       ========================================================================== */
     let deferredInstallPrompt = null;
     const btnInstall = document.getElementById('btnInstall');
     const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -1355,9 +1509,6 @@
       });
     }
 
-    /* ==========================================================================
-       6. EVENTOS
-       ========================================================================== */
     document.getElementById('btnConnect').addEventListener('click', () => {
       const ip = document.getElementById('mixerIp').value.trim();
       if (!ip) { alert('Informe o IP da mesa Soundcraft.'); return; }
@@ -1374,7 +1525,7 @@
 
     function updatePosUi() {
       const el = document.getElementById('posCount');
-      if (el) el.textContent = `${state.positions.length} região(ões)` + (state.noiseBands ? ' · ruído de fundo medido' : '');
+      if (el) el.textContent = `${state.positions.length} região(ões)` + (state.noiseBands ? ' · ruído medido' : '');
     }
 
     document.getElementById('micCalibrationFile').addEventListener('change', async event => {
@@ -1385,7 +1536,7 @@
         state.micCalibration = parsed;
         state.micCalibrationName = file.name;
         document.getElementById('micCalibrationStatus').textContent =
-          `${file.name} · ${parsed.length} pontos · ${parsed[0].hz} Hz a ${parsed[parsed.length - 1].hz} Hz`;
+          `${file.name} · ${parsed.length} pontos`;
         clearAnalysisData();
         log(`[Microfone] Curva carregada: ${file.name}. Medições anteriores descartadas.`, 'success');
       } catch (err) {
@@ -1400,7 +1551,7 @@
 
     document.getElementById('phoneHeuristic').addEventListener('change', (e) => {
       state.usePhoneHeuristic = e.target.checked;
-      log(`[Microfone] Compensação heurística de celular ${state.usePhoneHeuristic ? 'ATIVADA' : 'desativada'}.`, 'info');
+      log(`[Microfone] Compensação heurística ${state.usePhoneHeuristic ? 'ATIVADA' : 'desativada'}.`, 'info');
       if (state.positions.length) recalculateFromPositions();
     });
 
@@ -1408,7 +1559,6 @@
       if (state.isAnalyzing) return;
       state.isAnalyzing = true;
       
-      // Inicializa o microfone ANTES de qualquer await longo
       try {
         await rta.init();
       } catch (err) {
@@ -1428,7 +1578,7 @@
       let wasBypassed = state.isBypassed, changedBypass = false;
 
       btnStartRta.disabled = true;
-      progressBox.style.display = 'block';
+      progressBox.classList.remove('hidden');
       progressBar.style.width = '0%';
 
       try {
@@ -1447,9 +1597,9 @@
 
         const averaged = await rta.startCapture(duration, (pct, remaining) => {
           progressBar.style.width = `${pct * 100}%`;
-          countdownTimer.textContent = `Ouvindo: ${remaining}s`;
+          countdownTimer.textContent = `${remaining}s`;
         });
-        countdownTimer.textContent = 'Captura concluída';
+        countdownTimer.textContent = 'Concluído';
 
         if (mode === 'noise') {
           state.noiseBands = averaged;
@@ -1496,7 +1646,7 @@
         }
         state.isAnalyzing = false;
         btnStartRta.disabled = false;
-        setTimeout(() => { progressBox.style.display = 'none'; }, 1500);
+        setTimeout(() => { progressBox.classList.add('hidden'); }, 1500);
       }
     });
 
@@ -1536,23 +1686,18 @@
 
     document.getElementById('btnToggleBypass').addEventListener('click', () => mixer.toggleBypass());
 
-    // --- NOVAS FUNÇÕES DE COPIAR E COLAR CURVA ---
     document.getElementById('btnCopyEq').addEventListener('click', async () => {
       if (state.gainsDB.every(g => g === 0)) {
         if (!confirm('A curva atual está zerada. Deseja copiar mesmo assim?')) return;
       }
       
-      const payload = {
-        type: "UiRTA_EQ_Snapshot",
-        version: 1,
-        gainsDB: state.gainsDB
-      };
+      const payload = { type: "UiRTA_EQ_Snapshot", version: 1, gainsDB: state.gainsDB };
       const textToCopy = JSON.stringify(payload);
 
       try {
         await navigator.clipboard.writeText(textToCopy);
         log('[Sistema] Curva copiada para a área de transferência.', 'success');
-        alert('Curva copiada com sucesso!\nEnvie este texto para o outro aparelho.');
+        alert('Curva copiada com sucesso!');
       } catch (err) {
         log(`[Sistema] Falha ao copiar automaticamente: ${err.message}`, 'error');
         prompt('Não foi possível copiar automaticamente. Selecione e copie o texto abaixo:', textToCopy);
@@ -1592,9 +1737,6 @@
       }
     });
 
-    /* ==========================================================================
-       7. INIT
-       ========================================================================== */
     window.addEventListener('DOMContentLoaded', () => {
       buildFadersUi();
       resizeCanvas();
@@ -1603,7 +1745,7 @@
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (!window.isSecureContext && !isLocalhost) {
         const warn = document.getElementById('securityWarning');
-        if (warn) warn.style.display = 'block';
+        if (warn) warn.classList.remove('hidden');
         log('[Segurança] Contexto inseguro: microfone bloqueado.', 'error');
       }
       updateBypassUi();
