@@ -21,19 +21,10 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
   <style>
     :root {
-      --bg-dark: #0f1013;
-      --bg-panel: #17191e;
-      --bg-card: #20232b;
-      --bg-card-hover: #272a34;
-      --border-color: #2e3340;
-      --primary: #00d2ff;
-      --primary-glow: rgba(0, 210, 255, 0.25);
-      --accent: #ff9900;
-      --success: #00e676;
-      --danger: #ff5252;
-      --text-main: #f0f2f5;
-      --text-muted: #8e95a5;
-      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --bg-dark: #0f1013; --bg-panel: #17191e; --bg-card: #20232b; --bg-card-hover: #272a34;
+      --border-color: #2e3340; --primary: #00d2ff; --primary-glow: rgba(0, 210, 255, 0.25);
+      --accent: #ff9900; --success: #00e676; --danger: #ff5252; --text-main: #f0f2f5;
+      --text-muted: #8e95a5; --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     body {
@@ -311,6 +302,9 @@
           <button id="btnToggleBypass" class="btn" disabled>
             Bypass do EQ: <strong id="bypassState" style="color: var(--success); margin-left: 4px;">INATIVO</strong>
           </button>
+          <!-- NOVOS BOTÕES DE EXPORTAR/IMPORTAR -->
+          <button id="btnCopyEq" class="btn" title="Copiar curva calculada para usar em outro celular">📋 Copiar Curva</button>
+          <button id="btnPasteEq" class="btn" title="Colar curva calculada de outro celular">📋 Colar Curva</button>
         </div>
         <button id="btnApplyMixer" class="btn btn-apply" disabled>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -335,7 +329,6 @@
 
     function formatFreq(hz) { return hz >= 1000 ? (hz / 1000) + 'k' : hz.toString(); }
 
-    // Curva House ajustada: +3.5dB em 63Hz/80Hz para um "warmth" real de PA.
     const TARGET_CURVES = {
       flat: new Array(31).fill(0),
       house: [
@@ -1057,7 +1050,7 @@
         for (let k = -1; k <= 1; k += 2) {
           const j = i + k;
           if (j < 0 || j > 30 || !reliable[j]) continue;
-          // FIX DO BUG: Ignora vizinhos que estão em 0 para não diluir cortes cirúrgicos
+          // Ignora vizinhos que estão em 0 para não diluir cortes cirúrgicos
           if (gains[j] !== 0 && Math.sign(gains[j]) === Math.sign(gains[i])) {
             sum += gains[j];
             w++;
@@ -1159,7 +1152,6 @@
       ctx.stroke();
 
       // 3) Previsto Pós-EQ
-      // FIX DO BUG: Não desenha a linha verde no modo verificação (verifyReliable true) para não somar o EQ duas vezes
       if (state.correctedRTA && !state.verifyReliable && state.gainsDB.some(g => Math.abs(g) > 0.05)) {
         ctx.beginPath();
         ctx.strokeStyle = '#00e676';
@@ -1167,7 +1159,6 @@
         ctx.setLineDash([3 * window.devicePixelRatio, 3 * window.devicePixelRatio]);
         hasPoint = false;
         
-        // Simula a "suavidade" do GEQ para a linha verde ficar realista
         const simulatedGains = new Array(31).fill(0);
         for (let i = 0; i < 31; i++) {
             let sum = state.gainsDB[i] * 2;
@@ -1417,8 +1408,7 @@
       if (state.isAnalyzing) return;
       state.isAnalyzing = true;
       
-      // FIX DO BUG DO IPHONE: Inicializa o microfone ANTES de qualquer await longo (como bypass da mesa)
-      // Se o AudioContext for criado depois do await, o iOS bloqueia o áudio por perder o "user gesture".
+      // Inicializa o microfone ANTES de qualquer await longo
       try {
         await rta.init();
       } catch (err) {
@@ -1545,6 +1535,62 @@
     });
 
     document.getElementById('btnToggleBypass').addEventListener('click', () => mixer.toggleBypass());
+
+    // --- NOVAS FUNÇÕES DE COPIAR E COLAR CURVA ---
+    document.getElementById('btnCopyEq').addEventListener('click', async () => {
+      if (state.gainsDB.every(g => g === 0)) {
+        if (!confirm('A curva atual está zerada. Deseja copiar mesmo assim?')) return;
+      }
+      
+      const payload = {
+        type: "UiRTA_EQ_Snapshot",
+        version: 1,
+        gainsDB: state.gainsDB
+      };
+      const textToCopy = JSON.stringify(payload);
+
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        log('[Sistema] Curva copiada para a área de transferência.', 'success');
+        alert('Curva copiada com sucesso!\nEnvie este texto para o outro aparelho.');
+      } catch (err) {
+        log(`[Sistema] Falha ao copiar automaticamente: ${err.message}`, 'error');
+        prompt('Não foi possível copiar automaticamente. Selecione e copie o texto abaixo:', textToCopy);
+      }
+    });
+
+    document.getElementById('btnPasteEq').addEventListener('click', async () => {
+      let text = '';
+      try {
+        text = await navigator.clipboard.readText();
+      } catch (err) {
+        log(`[Sistema] Sem permissão para ler a área de transferência: ${err.message}.`, 'error');
+        text = prompt('Cole o texto da curva copiado do outro aparelho:');
+      }
+      
+      if (!text) return;
+
+      try {
+        const payload = JSON.parse(text);
+        if (payload.type !== "UiRTA_EQ_Snapshot" || !Array.isArray(payload.gainsDB) || payload.gainsDB.length !== 31) {
+          throw new Error('Formato de dados inválido ou não corresponde a uma curva do Ui-RTA.');
+        }
+        if (payload.gainsDB.some(g => typeof g !== 'number' || !Number.isFinite(g) || g < -15 || g > 15)) {
+          throw new Error('Valores de ganho inválidos (devem ser entre -15 e +15 dB).');
+        }
+
+        state.gainsDB = payload.gainsDB;
+        updateAllFadersUi();
+        renderVisualizer();
+        updateMixerControls();
+        
+        log('[Sistema] Curva importada com sucesso!', 'success');
+        alert('Curva importada com sucesso!\nVocê já pode aplicar as correções na mesa.');
+      } catch (err) {
+        log(`[Sistema] Erro ao importar curva: ${err.message}`, 'error');
+        alert(`Falha ao importar a curva: ${err.message}`);
+      }
+    });
 
     /* ==========================================================================
        7. INIT
