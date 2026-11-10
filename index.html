@@ -137,6 +137,18 @@
     }
     .btn-apply:hover { background: linear-gradient(135deg, #ffa826, #f27c00); box-shadow: 0 4px 20px rgba(255, 153, 0, 0.4); }
 
+    /* Estado desabilitado de botões de ação principais: fica visível mas claramente inativo */
+    .btn-apply:disabled,
+    .btn-action:disabled {
+      opacity: 1;
+      filter: none;
+      background: linear-gradient(135deg, #3a3f4d, #2a2e38) !important;
+      color: #8b93a3 !important;
+      box-shadow: none !important;
+      border: 1px solid #333844;
+      cursor: not-allowed;
+    }
+
     .btn-icon {
       padding: 10px; width: 40px; height: 40px; border-radius: var(--radius-sm);
       background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted);
@@ -500,6 +512,11 @@
   <script>
     /* ==========================================================================
        LÓGICA INTACTA + NOVA ROTA data: URL PARA iOS
+       Correções:
+         - updateMixerControls() chamado no finally da captura (evita botão
+           "Copiar URL de aplicação (iOS)" preso em disabled).
+         - CSS dedicado para :disabled dos botões de ação (mantém visível).
+         - Botão "Aplicar no Master L/R" também respeita state.isAnalyzing.
        ========================================================================== */
     const ISO_FREQUENCIES = [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000];
 
@@ -1420,7 +1437,8 @@
       const bypass = document.getElementById('btnToggleBypass');
       const dataUrl = document.getElementById('btnCopyDataUrl');
       const enoughReliable = state.lastReliable && state.lastReliable.filter(Boolean).length >= 4;
-      if (apply)   apply.disabled   = !snapshotReady || !!mixer.pendingApply || state.positions.length === 0 || !enoughReliable;
+
+      if (apply)   apply.disabled   = !snapshotReady || !!mixer.pendingApply || state.positions.length === 0 || !enoughReliable || state.isAnalyzing;
       if (reset)   reset.disabled   = !snapshotReady || !!mixer.pendingApply;
       if (undo)    undo.disabled    = !snapshotReady || !state.undoGains;
       if (bypass)  bypass.disabled  = !mixer.isConnected || !Number.isFinite(mixer.params['m.eq.bypass']);
@@ -1669,6 +1687,7 @@
       } catch (err) {
         log(`[RTA] Falha ao iniciar microfone: ${err.message}`, 'error');
         state.isAnalyzing = false;
+        updateMixerControls(); // reflete estado mesmo em erro de init
         return;
       }
 
@@ -1685,6 +1704,9 @@
       btnStartRta.disabled = true;
       progressBox.classList.remove('hidden');
       progressBar.style.width = '0%';
+
+      // Atualiza imediatamente para refletir state.isAnalyzing = true nos botões dependentes
+      updateMixerControls();
 
       try {
         if (autoBypass) {
@@ -1751,6 +1773,10 @@
         }
         state.isAnalyzing = false;
         btnStartRta.disabled = false;
+        // CORREÇÃO PRINCIPAL: recalcula os botões dependentes após liberar a análise.
+        // Sem esta chamada, o botão "Copiar URL de aplicação (iOS)" ficaria preso em disabled
+        // (parecia "sumido" por causa do estilo de opacidade sobre fundo escuro no iOS).
+        updateMixerControls();
         setTimeout(() => { progressBox.classList.add('hidden'); }, 1500);
       }
     });
@@ -1842,7 +1868,7 @@
       }
     });
 
-    /* NOVO: handler do botão "Copiar URL de aplicação (iOS)" */
+    /* handler do botão "Copiar URL de aplicação (iOS)" */
     document.getElementById('btnCopyDataUrl').addEventListener('click', async () => {
       if (state.positions.length === 0) {
         alert('Faça pelo menos uma medição antes.');
